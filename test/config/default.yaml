@@ -1,0 +1,9 @@
+service: 'storage'
+
+dynamodb:
+  isLocal: true
+
+provider:
+  stage:   'test'
+  region:  'localhost'
+  profile: 'private'
