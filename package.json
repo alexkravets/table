@@ -1,6 +1,6 @@
 {
   "name": "@slatestudio/common-storage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Common storage adaptors for common service documents",
   "main": "index.js",
   "repository": {
@@ -22,10 +22,8 @@
     "lodash.keyby": "^4.6.0",
     "uuid": "^3.3.2"
   },
-  "optionalDependencies": {
-    "aws-sdk": "^2.368.0"
-  },
   "devDependencies": {
+    "aws-sdk": "^2.368.0",
     "chai": "^4.1.2",
     "eslint": "^5.1.0",
     "mocha": "^5.2.0",
