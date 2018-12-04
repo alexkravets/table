@@ -20,13 +20,26 @@ const DynamoDocument = class extends Dynamo(class {}) {
   static documentId({ lastName }) {
     return lastName
   }
+
+  static get errors() {
+    return {
+      ...super.errors,
+      updatedAtIndex: { primaryKey: 'resourceName', sortKey: 'updatedAt' }
+    }
+  }
 }
+
+describe('Dynamo.dynamo', () => {
+  it('returns DynamoDB client', () => {
+    expect(DynamoDocument.dynamo).to.exist
+  })
+})
 
 describe('Dynamo.documentId()', () => {
   it('returns UUID by default', () => {
     const Document = Dynamo(class {})
     const id = Document.documentId()
-    expect(id).to.be.not.undefined
+    expect(id).to.exist
   })
 })
 
