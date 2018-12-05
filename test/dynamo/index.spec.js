@@ -341,6 +341,14 @@ describe('Dynamo._index(query, options)', () => {
     expect(doc.parameters.tags).to.include('tag2')
   })
 
+  it('supports :not option in query', async() => {
+    const { docs, count } = await DynamoDocument._index({ 'parameters.tags:not': 'tag2' }, { limit: 2 })
+    const [ doc ] = docs
+
+    expect(count).to.equal(2)
+    expect(doc.parameters.tags).not.to.include('tag2')
+  })
+
   it('throws ValidationException if one of attributes is undefined', async() => {
     await expectError(() => DynamoDocument._index({ firstName: undefined }),
       'code', 'ValidationException')
