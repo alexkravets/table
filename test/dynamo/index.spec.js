@@ -182,7 +182,10 @@ describe('Dynamo._update(id, attributes)', () => {
     const attributes = {
       firstName: 'Stanislav',
       lastName:  'Kravets',
-      tags:      [ 'tag1' ]
+      tags:      [ 'tag1' ],
+      parameters: {
+        nestedTags: [ 'nestedTag1' ]
+      }
     }
 
     const Item = await DynamoDocument._create(attributes)
@@ -199,10 +202,10 @@ describe('Dynamo._update(id, attributes)', () => {
   })
 
   it('supports :append operation', async() => {
-    const attributes  = { 'tags:append': 'tag2' }
+    const attributes  = { 'parameters.nestedTags:append': 'nestedTag2' }
     const updatedItem = await DynamoDocument._update(itemId, attributes)
 
-    expect(updatedItem.tags).to.include('tag2')
+    expect(updatedItem.parameters.nestedTags).to.include('nestedTag2')
   })
 
   it('throws ResourceNotFoundError if :append already included value', async() => {
