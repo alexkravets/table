@@ -1,9 +1,9 @@
-service: 'storage'
-
-dynamodb:
-  isLocal: true
+service: storage
 
 provider:
-  stage:   'test'
-  region:  'localhost'
-  profile: 'private'
+  stage:   test
+  region:  localhost
+  profile: private
+
+dynamodb:
+  endpoint: http://0.0.0.0:8000
