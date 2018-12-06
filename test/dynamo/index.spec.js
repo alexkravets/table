@@ -284,7 +284,7 @@ describe('Dynamo._index(query, options)', () => {
       firstName:  'Alexander',
       lastName:   'Popov',
       parameters: {
-        tags:  [ 'tag3' ],
+        tags:  [ 'tag3', 'tag4' ],
         shirt: { size: 'S' }
       }
     })
@@ -328,6 +328,19 @@ describe('Dynamo._index(query, options)', () => {
     expect(docs).to.have.lengthOf(3)
     expect(doc.firstName).to.equal('Alexander')
     expect(lastEvaluatedKey).to.equal(undefined)
+  })
+
+  it('supports query with attributes projection', async() => {
+    const { docs } = await DynamoDocument._index({}, { limit: 1, projection: 'lastName, parameters.tags[1]' })
+    const [ doc ]  = docs
+
+    expect(doc.firstName).to.be.undefined
+    expect(doc.lastName).to.equal('Popov')
+    expect(doc.parameters).not.to.be.undefined
+    expect(doc.parameters.tags).not.to.be.undefined
+    expect(doc.parameters.tags.length).to.equal(1)
+    expect(doc.parameters.tags[0]).to.equal('tag4')
+    expect(doc.parameters.shirt).to.be.undefined
   })
 
   it('supports query with nested attributes', async() => {
