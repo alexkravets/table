@@ -209,6 +209,13 @@ describe('Dynamo._update(id, attributes)', () => {
     expect(updatedItem.parameters.nestedTags).to.include('nestedTag2')
   })
 
+  it('supports :prepend operation', async() => {
+    const attributes  = { 'parameters.nestedTags:prepend': 'nestedTag0' }
+    const updatedItem = await DynamoDocument._update(itemId, attributes)
+
+    expect(updatedItem.parameters.nestedTags[0]).to.equal('nestedTag0')
+  })
+
   it('throws ResourceNotFoundError if :append already included value', async() => {
     const attributes = { 'tags:append': 'tag1' }
     await expectError(() => DynamoDocument._update(itemId, attributes),
@@ -220,6 +227,20 @@ describe('Dynamo._update(id, attributes)', () => {
     const updatedItem = await DynamoDocument._update(itemId, attributes)
 
     expect(updatedItem.parameters.size).to.equal('XL')
+  })
+
+  it('supports update with array item', async() => {
+    const attributes  = { 'tags[0]': 'tag2' }
+    const updatedItem = await DynamoDocument._update(itemId, attributes)
+
+    expect(updatedItem.tags[0]).to.equal('tag2')
+  })
+
+  it('supports update with nested attributes array item', async() => {
+    const attributes  = { 'parameters.nestedTags[0]': 'nestedTag2' }
+    const updatedItem = await DynamoDocument._update(itemId, attributes)
+
+    expect(updatedItem.parameters.nestedTags[0]).to.equal('nestedTag2')
   })
 
   it('throws ResourceNotFoundError if item is not found', async() => {
