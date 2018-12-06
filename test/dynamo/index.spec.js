@@ -184,7 +184,8 @@ describe('Dynamo._update(id, attributes)', () => {
       lastName:  'Kravets',
       tags:      [ 'tag1' ],
       parameters: {
-        nestedTags: [ 'nestedTag1' ]
+        nestedTags: [ 'nestedTag1' ],
+        size: 'L'
       }
     }
 
@@ -212,6 +213,13 @@ describe('Dynamo._update(id, attributes)', () => {
     const attributes = { 'tags:append': 'tag1' }
     await expectError(() => DynamoDocument._update(itemId, attributes),
       'code', 'ResourceNotFoundError')
+  })
+
+  it('supports update with nested attributes', async() => {
+    const attributes  = { 'parameters.size': 'XL' }
+    const updatedItem = await DynamoDocument._update(itemId, attributes)
+
+    expect(updatedItem.parameters.size).to.equal('XL')
   })
 
   it('throws ResourceNotFoundError if item is not found', async() => {
