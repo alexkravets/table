@@ -352,7 +352,7 @@ describe('Dynamo._index(query, options)', () => {
   })
 
   it('supports query with attributes projection', async() => {
-    const { docs } = await DynamoDocument._index({}, { limit: 1, projection: 'lastName, parameters.tags[1]' })
+    const { docs } = await DynamoDocument._index({}, { limit: 1, projection: [ 'lastName', 'parameters.tags[1]' ] })
     const [ doc ]  = docs
 
     expect(doc.firstName).to.be.undefined
