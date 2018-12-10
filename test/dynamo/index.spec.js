@@ -108,7 +108,11 @@ describe('Dynamo._read(query, options)', () => {
 
     const attributes = {
       firstName: 'Stanislav',
-      lastName:  'Kravets'
+      lastName:  'Kravets',
+      parameters: {
+        tags:  [ 'tag1', 'tag2' ],
+        shirt: { size: 'L' }
+      }
     }
 
     const Item = await DynamoDocument._create(attributes)
@@ -120,8 +124,30 @@ describe('Dynamo._read(query, options)', () => {
     expect(item.firstName).to.equal('Stanislav')
   })
 
+  it('returns item by firstName', async() => {
+    const item = await DynamoDocument._read({ firstName: 'Stanislav' })
+    expect(item.firstName).to.equal('Stanislav')
+  })
+
+  it('returns item with attributes projection', async() => {
+    const item = await DynamoDocument._read({ id: itemId }, { projection: [ 'lastName', 'parameters.tags[1]' ] })
+
+    expect(item.firstName).to.be.undefined
+    expect(item.lastName).to.equal('Kravets')
+    expect(item.parameters).not.to.be.undefined
+    expect(item.parameters.tags).not.to.be.undefined
+    expect(item.parameters.tags.length).to.equal(1)
+    expect(item.parameters.tags[0]).to.equal('tag2')
+    expect(item.parameters.shirt).to.be.undefined
+  })
+
   it('throws ResourceNotFoundError if item is not found', async() => {
     await expectError(() => DynamoDocument._read({ id: 'ITEM_ID' }), 'code',
+      'ResourceNotFoundError')
+  })
+
+  it('throws ResourceNotFoundError if item is not found by firstName', async() => {
+    await expectError(() => DynamoDocument._read({ firstName: 'ITEM_ID' }), 'code',
       'ResourceNotFoundError')
   })
 
