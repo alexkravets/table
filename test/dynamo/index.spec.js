@@ -38,8 +38,11 @@ describe('Dynamo.dynamo', () => {
 describe('Dynamo.documentId()', () => {
   it('returns UUID by default', () => {
     const Document = Dynamo(class {})
-    const id = Document.documentId()
+    let id = Document.documentId()
     expect(id).to.exist
+
+    id = Document.documentId({ id: 'PREDEFINED_ID' })
+    expect(id).to.equal('PREDEFINED_ID')
   })
 })
 
