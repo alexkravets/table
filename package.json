@@ -1,6 +1,6 @@
 {
   "name": "@slatestudio/common-storage",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Common storage adaptors for common service documents",
   "main": "index.js",
   "repository": {

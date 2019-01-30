@@ -7,3 +7,6 @@ provider:
 
 dynamodb:
   endpoint: http://0.0.0.0:8000
+  ProvisionedThroughput:
+      ReadCapacityUnits:  1
+      WriteCapacityUnits: 1
