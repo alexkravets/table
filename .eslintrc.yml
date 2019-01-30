@@ -37,10 +37,5 @@ rules:
   space-infix-ops: error
   space-unary-ops: error
   no-console: off
-  # key-spacing:
-  #   - error
-  #   -
-  #     align:
-  #       beforeColon: false
-  #       afterColon: true
-  #       on: value
+  no-return-await: error
+  eqeqeq: error
