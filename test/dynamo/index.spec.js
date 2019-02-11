@@ -166,7 +166,7 @@ describe('Dynamo._read(query, options)', () => {
   })
 })
 
-describe('Dynamo._delete(id)', () => {
+describe('Dynamo._delete(query)', () => {
   let itemId
   before(async() => {
     await DynamoDocument.resetCollection()
@@ -181,29 +181,35 @@ describe('Dynamo._delete(id)', () => {
   })
 
   it('deletes item', async() => {
-    await DynamoDocument._delete(itemId)
-    await expectError(() => DynamoDocument._delete(itemId), 'code',
+    await DynamoDocument._delete({ id: itemId })
+    await expectError(() => DynamoDocument._delete({ id: itemId }), 'code',
       'ResourceNotFoundError')
   })
 
   it('throws ResourceNotFoundError if item is not found', async() => {
-    await expectError(() => DynamoDocument._delete('ITEM_ID'), 'code',
+    await expectError(() => DynamoDocument._delete({ id: 'ITEM_ID' }), 'code',
+      'ResourceNotFoundError')
+  })
+
+  it('throws ResourceNotFoundError if item is not found due to condition', async() => {
+    const query = { id: itemId, firstName: 'Sergiy' }
+    await expectError(() => DynamoDocument._delete(query), 'code',
       'ResourceNotFoundError')
   })
 
   it('throws ValidationException if ID is undefined', async() => {
-    await expectError(() => DynamoDocument._delete(), 'code',
+    await expectError(() => DynamoDocument._delete({}), 'code',
       'ValidationException')
   })
 
   it('throws error if table does not exist', async() => {
     await DynamoDocument.deleteCollection()
-    await expectError(() => DynamoDocument._delete('ITEM_ID'), 'message',
+    await expectError(() => DynamoDocument._delete({ id: 'ITEM_ID' }), 'message',
       'Table storage-test-DynamoDocument doesn\'t exists')
   })
 })
 
-describe('Dynamo._update(id, attributes)', () => {
+describe('Dynamo._update(query, attributes)', () => {
   let itemId
   before(async() => {
     await DynamoDocument.resetCollection()
@@ -227,65 +233,73 @@ describe('Dynamo._update(id, attributes)', () => {
       firstName: 'Alexander'
     }
 
-    const updatedItem = await DynamoDocument._update(itemId, attributes)
+    const updatedItem = await DynamoDocument._update({ id: itemId }, attributes)
     expect(updatedItem.firstName).to.equal('Alexander')
   })
 
   it('supports :append operation', async() => {
     const attributes  = { 'parameters.nestedTags:append': 'nestedTag2' }
-    const updatedItem = await DynamoDocument._update(itemId, attributes)
+    const updatedItem = await DynamoDocument._update({ id: itemId }, attributes)
 
     expect(updatedItem.parameters.nestedTags).to.include('nestedTag2')
   })
 
   it('supports :prepend operation', async() => {
     const attributes  = { 'parameters.nestedTags:prepend': 'nestedTag0' }
-    const updatedItem = await DynamoDocument._update(itemId, attributes)
+    const updatedItem = await DynamoDocument._update({ id: itemId }, attributes)
 
     expect(updatedItem.parameters.nestedTags[0]).to.equal('nestedTag0')
   })
 
   it('throws ResourceNotFoundError if :append already included value', async() => {
     const attributes = { 'tags:append': 'tag1' }
-    await expectError(() => DynamoDocument._update(itemId, attributes),
+    await expectError(() => DynamoDocument._update({ id: itemId }, attributes),
       'code', 'ResourceNotFoundError')
   })
 
   it('supports update with nested attributes', async() => {
     const attributes  = { 'parameters.size': 'XL' }
-    const updatedItem = await DynamoDocument._update(itemId, attributes)
+    const updatedItem = await DynamoDocument._update({ id: itemId }, attributes)
 
     expect(updatedItem.parameters.size).to.equal('XL')
   })
 
   it('supports update with array item', async() => {
     const attributes  = { 'tags[0]': 'tag2' }
-    const updatedItem = await DynamoDocument._update(itemId, attributes)
+    const updatedItem = await DynamoDocument._update({ id: itemId }, attributes)
 
     expect(updatedItem.tags[0]).to.equal('tag2')
   })
 
   it('supports update with nested attributes array item', async() => {
     const attributes  = { 'parameters.nestedTags[0]': 'nestedTag2' }
-    const updatedItem = await DynamoDocument._update(itemId, attributes)
+    const updatedItem = await DynamoDocument._update({ id: itemId }, attributes)
 
     expect(updatedItem.parameters.nestedTags[0]).to.equal('nestedTag2')
   })
 
   it('throws ResourceNotFoundError if item is not found', async() => {
     const attributes = { firstName: 'Olga' }
-    await expectError(() => DynamoDocument._update('ITEM_ID', attributes),
+    await expectError(() => DynamoDocument._update({ id: 'ITEM_ID' }, attributes),
+      'code', 'ResourceNotFoundError')
+  })
+
+  it('throws ResourceNotFoundError if item is not found due to condition', async() => {
+    const query      = { id: itemId, firstName: 'Sergiy' }
+    const attributes = { firstName: 'Olga' }
+
+    await expectError(() => DynamoDocument._update(query, attributes),
       'code', 'ResourceNotFoundError')
   })
 
   it('throws ValidationException if ID is undefined', async() => {
-    await expectError(() => DynamoDocument._update(undefined, {}), 'code',
+    await expectError(() => DynamoDocument._update({}, {}), 'code',
       'ValidationException')
   })
 
   it('throws error if table does not exist', async() => {
     await DynamoDocument.deleteCollection()
-    await expectError(() => DynamoDocument._update('ITEM_ID', {}), 'message',
+    await expectError(() => DynamoDocument._update({ id: 'ITEM_ID' }, {}), 'message',
       'Table storage-test-DynamoDocument doesn\'t exists')
   })
 })
