@@ -31,6 +31,10 @@ const DynamoDocument = class extends Dynamo(class {}) {
 }
 
 const DynamoDocumentCustomPartitionKey = class extends Dynamo(class {}) {
+  static documentId({ lastName, firstName }) {
+    return `${lastName}#${firstName}`
+  }
+
   static get tablePartitionKey() {
     return 'unit'
   }

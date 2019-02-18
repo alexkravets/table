@@ -59,6 +59,30 @@ before(async() => {
       shirt: { size: 'S' }
     }
   })
+
+  await DynamoDocumentCustomPartitionKey._create({
+    unit:      '1',
+    lastName:  'Kravets',
+    firstName: 'Alexander'
+  })
+
+  await DynamoDocumentCustomPartitionKey._create({
+    unit:      '1',
+    lastName:  'Simonenkov',
+    firstName: 'Artem'
+  })
+
+  await DynamoDocumentCustomPartitionKey._create({
+    unit:      '1',
+    lastName:  'Popov',
+    firstName: 'Denis'
+  })
+
+  await DynamoDocumentCustomPartitionKey._create({
+    unit:      '2',
+    lastName:  'Kravets',
+    firstName: 'Alexander'
+  })
 })
 
 it('returns docs, count', async() => {
@@ -71,6 +95,31 @@ it('returns docs, count', async() => {
   expect(doc).to.include({
     firstName: 'Alexander',
     lastName:  'Popov'
+  })
+})
+
+it('returns docs, count using composed sort key and consistent read', async() => {
+  const { docs, count } = await DynamoDocumentCustomPartitionKey._index({
+    unit: '1',
+  }, { sort: 'asc', ConsistentRead: true })
+
+  expect(count).to.equal(3)
+  expect(docs).to.have.lengthOf(3)
+
+  const [ kravets, popov, simonenkov ] = docs
+  expect(kravets).to.include({
+    lastName:  'Kravets',
+    firstName: 'Alexander'
+  })
+
+  expect(popov).to.include({
+    lastName:  'Popov',
+    firstName: 'Denis'
+  })
+
+  expect(simonenkov).to.include({
+    lastName:  'Simonenkov',
+    firstName: 'Artem'
   })
 })
 

@@ -26,8 +26,11 @@ before(async() => {
   itemId = Item.id
 })
 
-it('returns item via primaryKey', async() => {
-  const item = await DynamoDocument._read({ id: itemId })
+it('returns item via primaryKey in a consistent way', async() => {
+  const item = await DynamoDocument._read({ id: itemId }, {
+    ConsistentRead: true
+  })
+
   expect(item.firstName).to.equal('Stanislav')
 })
 
