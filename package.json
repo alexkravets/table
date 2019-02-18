@@ -1,6 +1,6 @@
 {
   "name": "@slatestudio/common-storage",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Common storage adaptors for common service documents",
   "main": "index.js",
   "repository": {
@@ -31,6 +31,6 @@
     "chai": "^4.1.2",
     "eslint": "^5.12.1",
     "mocha": "^5.2.0",
-    "nyc": "^11.9.0"
+    "nyc": "^13.3.0"
   }
 }
