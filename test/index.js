@@ -1,8 +1,7 @@
 'use strict'
 
 describe('Errors', () => {
-  require('./errors/ResourceExistsError.spec')
-  require('./errors/ResourceNotFoundError.spec')
+  require('./errors/ResourceUpdateError.spec')
 })
 
 describe('Dynamo', () => {

@@ -8,6 +8,8 @@ const {
 } = require('./helpers')
 
 let itemId
+let itemId2
+
 before(async() => {
   await DynamoDocument.resetCollection()
   await DynamoDocumentCustomPartitionKey.resetCollection()
@@ -24,6 +26,15 @@ before(async() => {
 
   const Item = await DynamoDocument._create(attributes)
   itemId = Item.id
+
+  const attributes2 = {
+    firstName: 'Stanislav',
+    lastName:  'Kravets',
+    unit:      '1'
+  }
+
+  const Item2 = await DynamoDocumentCustomPartitionKey._create(attributes2)
+  itemId2 = Item2.id
 })
 
 it('updates item', async() => {
@@ -33,6 +44,10 @@ it('updates item', async() => {
 
   const updatedItem = await DynamoDocument._update({ id: itemId }, attributes)
   expect(updatedItem.firstName).to.equal('Alexander')
+
+  const updatedItem2 =
+    await DynamoDocumentCustomPartitionKey._update({ id: itemId2 }, { ...attributes, unit: '1' })
+  expect(updatedItem2.firstName).to.equal('Alexander')
 })
 
 it('supports :append operation', async() => {
