@@ -1,6 +1,7 @@
 'use strict'
 
 const {
+  wait,
   expect,
   expectError,
   DynamoDocument,
@@ -17,8 +18,11 @@ before(async() => {
       size:  1,
       tags:  [ 'tag2', 'tag4' ],
       shirt: { size: 'L' }
-    }
+    },
+    createdAt: new Date().toJSON()
   })
+
+  await wait(50)
 
   await DynamoDocument._create({
     firstName:  'Alexander',
@@ -27,8 +31,11 @@ before(async() => {
       size:  2,
       tags:  [ 'tag1' ],
       shirt: { size: 'L' }
-    }
+    },
+    createdAt: new Date().toJSON()
   })
+
+  await wait(50)
 
   await DynamoDocument._create({
     firstName:  'Alexander',
@@ -37,8 +44,11 @@ before(async() => {
       size:  3,
       tags:  [ 'tag2' ],
       shirt: { size: 'M' }
-    }
+    },
+    createdAt: new Date().toJSON()
   })
+
+  await wait(50)
 
   await DynamoDocument._create({
     firstName:  'Alexander',
@@ -47,8 +57,11 @@ before(async() => {
       size:  1,
       tags:  [ 'tag3' ],
       shirt: { size: 'XL' }
-    }
+    },
+    createdAt: new Date().toJSON()
   })
+
+  await wait(50)
 
   await DynamoDocument._create({
     firstName:  'Alexander',
@@ -57,7 +70,8 @@ before(async() => {
       size:  2,
       tags:  [ 'tag3', 'tag4' ],
       shirt: { size: 'S' }
-    }
+    },
+    createdAt: new Date().toJSON()
   })
 
   await DynamoDocumentCustomPartitionKey._create({

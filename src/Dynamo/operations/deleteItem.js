@@ -4,10 +4,10 @@ const getPrimaryKey          = require('../helpers/getPrimaryKey')
 const ResourceNotFoundError  = require('../../errors/ResourceNotFoundError')
 const getConditionExpression = require('../helpers/getConditionExpression')
 
-const deleteItem = async(client, tableKey, query) => {
-  const { tableName: TableName, partitionKey } = tableKey
+const deleteItem = async(client, queryKey, query) => {
+  const { tableName: TableName, partitionKey } = queryKey
 
-  const Key = getPrimaryKey(tableKey, query)
+  const Key = getPrimaryKey(queryKey, query)
   delete query[partitionKey]
 
   let {

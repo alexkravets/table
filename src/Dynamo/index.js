@@ -3,6 +3,7 @@
 const uuid       = require('uuid/v4')
 const config     = require('./helpers/config')
 const readItem   = require('./operations/readItem')
+const cloneDeep  = require('lodash.clonedeep')
 const indexItems = require('./operations/indexItems')
 const createItem = require('./operations/createItem')
 const deleteItem = require('./operations/deleteItem')
@@ -81,7 +82,7 @@ const Dynamo = Document => class extends Document {
     await this.createCollection()
   }
 
-  static _getTableKey(indexName) {
+  static _getQueryKey(indexName) {
     if (!indexName) { return this.tablePrimaryKey }
 
     const { indexes, tableName, tablePartitionKey } = this
@@ -92,10 +93,12 @@ const Dynamo = Document => class extends Document {
       throw new Error(`Index "${tableName}.${indexName}" is not defined`)
     }
 
-    return { tableName, partitionKey: tablePartitionKey, ...tableKey }
+    return { tableName, indexName, partitionKey: tablePartitionKey, ...tableKey }
   }
 
-  static _extendQueryDefaults(query, partitionKey = this.tablePartitionKey) {
+  static _cloneQuery(query, partitionKey = this.tablePartitionKey) {
+    query = cloneDeep(query)
+
     const isDefaultPartitionKey = partitionKey === 'resourceName'
 
     if (!isDefaultPartitionKey) {
@@ -105,6 +108,10 @@ const Dynamo = Document => class extends Document {
     return { resourceName: this.resourceName, ...query }
   }
 
+  static _cloneAttributes(attributes) {
+    return cloneDeep(attributes)
+  }
+
   static async _create(attributes) {
     const {
       tableName,
@@ -112,6 +119,8 @@ const Dynamo = Document => class extends Document {
       documentIdKey,
       tablePartitionKey
     } = this
+    attributes = this._cloneAttributes(attributes)
+
     attributes[documentIdKey] = this.documentId(attributes)
 
     const hasDefaultTablePartitionKey = tablePartitionKey === 'resourceName'
@@ -120,6 +129,7 @@ const Dynamo = Document => class extends Document {
     }
 
     await createItem(client, resourceName, documentIdKey, tableName, attributes)
+
     return attributes
   }
 
@@ -129,33 +139,35 @@ const Dynamo = Document => class extends Document {
 
     if (!indexName && hasDefaultIndex) { indexName = 'defaultIndex' }
 
-    const tableKey = this._getTableKey(indexName)
-    query = this._extendQueryDefaults(query, tableKey.partitionKey)
+    const queryKey = this._getQueryKey(indexName)
+    query = this._cloneQuery(query, queryKey.partitionKey)
 
-    const { items: docs, ...rest } = await indexItems(client, tableKey, query, options)
+    const { items: docs, ...rest } = await indexItems(client, queryKey, query, options)
 
     return { docs, ...rest }
   }
 
   static _read(query, options = {}) {
-    const tableKey = this._getTableKey(options.indexName)
-    query = this._extendQueryDefaults(query, tableKey.partitionKey)
+    const queryKey = this._getQueryKey(options.indexName)
+    query = this._cloneQuery(query, queryKey.partitionKey)
 
-    return readItem(client, tableKey, query, options)
+    return readItem(client, queryKey, query, options)
   }
 
   static _update(query, attributes) {
-    const tableKey = this.tablePrimaryKey
-    query = this._extendQueryDefaults(query)
+    const queryKey = this._getQueryKey()
 
-    return updateItem(client, tableKey, query, attributes)
+    query      = this._cloneQuery(query)
+    attributes = this._cloneAttributes(attributes)
+
+    return updateItem(client, queryKey, query, attributes)
   }
 
   static _delete(query) {
-    const tableKey = this.tablePrimaryKey
-    query = this._extendQueryDefaults(query)
+    const queryKey = this._getQueryKey()
+    query = this._cloneQuery(query)
 
-    return deleteItem(client, tableKey, query)
+    return deleteItem(client, queryKey, query)
   }
 }
 

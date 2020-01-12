@@ -1,6 +1,6 @@
 {
   "name": "@slatestudio/common-storage",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Common storage adaptors for common service documents",
   "main": "index.js",
   "repository": {
@@ -8,15 +8,16 @@
     "url": "http://github.com/slate-studio/common-storage.git"
   },
   "directories": {
-    "lib": "lib"
+    "src": "src"
   },
   "scripts": {
-    "test": "eslint lib/ test/ && NODE_PATH=./ NODE_CONFIG_DIR=./test/config nyc --reporter html --reporter text mocha --exit"
+    "test": "eslint src/ test/ && NODE_PATH=./ NODE_CONFIG_DIR=./test/config nyc --reporter html --reporter text mocha --exit"
   },
   "author": "Alexander Kravets <alex@slatestudio.com>",
   "license": "ISC",
   "dependencies": {
     "config": "^3.0.1",
+    "lodash.clonedeep": "^4.5.0",
     "lodash.endswith": "^4.2.1",
     "lodash.find": "^4.6.0",
     "lodash.get": "^4.4.2",

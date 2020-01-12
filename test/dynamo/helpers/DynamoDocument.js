@@ -1,6 +1,6 @@
 'use strict'
 
-const Dynamo = require('lib/dynamo')
+const Dynamo = require('src/Dynamo')
 
 const DynamoDocument = class extends Dynamo(class {}) {
   static get documentIdKey() {

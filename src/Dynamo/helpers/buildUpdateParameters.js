@@ -1,12 +1,26 @@
 'use strict'
 
-const endsWith               = require('lodash.endswith')
-const getPrimaryKey          = require('../helpers/getPrimaryKey')
-const ResourceUpdateError    = require('../../errors/ResourceUpdateError')
-const ResourceNotFoundError  = require('../../errors/ResourceNotFoundError')
+const endsWith      = require('lodash.endswith')
+const getPrimaryKey = require('../helpers/getPrimaryKey')
 const getConditionExpression = require('../helpers/getConditionExpression')
 
-const extendParametersWithUpdateExpression = (parameters, attributes) => {
+const buildUpdateParameters = (queryKey, query, attributes) => {
+  const { tableName, partitionKey } = queryKey
+
+  if (attributes[partitionKey]) {
+    query[partitionKey] = attributes[partitionKey]
+    delete attributes[partitionKey]
+  }
+
+  const Key = getPrimaryKey(queryKey, query)
+  delete query[partitionKey]
+
+  const parameters = getConditionExpression(query)
+
+  parameters.Key          = Key
+  parameters.TableName    = tableName
+  parameters.ReturnValues = 'ALL_NEW'
+
   const UpdateExpressions = []
 
   for (let name in attributes) {
@@ -53,44 +67,8 @@ const extendParametersWithUpdateExpression = (parameters, attributes) => {
   }
 
   parameters.UpdateExpression = `SET ${UpdateExpressions.join(', ')}`
+
+  return parameters
 }
 
-const updateItem = async(client, tableKey, query, attributes) => {
-  const { tableName: TableName, partitionKey } = tableKey
-
-  if (attributes[partitionKey]) {
-    query[partitionKey] = attributes[partitionKey]
-    delete attributes[partitionKey]
-  }
-
-  const Key = getPrimaryKey(tableKey, query)
-  delete query[partitionKey]
-
-  const conditionParameters = getConditionExpression(query)
-  extendParametersWithUpdateExpression(conditionParameters, attributes)
-
-  const ReturnValues = 'ALL_NEW'
-  const parameters   = { Key, TableName, ReturnValues, ...conditionParameters }
-
-  let result
-  try {
-    result = await client.update(parameters).promise()
-
-  } catch (error) {
-    if (error.code === 'ConditionalCheckFailedException') {
-      throw new ResourceNotFoundError({ ...Key, ...query })
-    }
-
-    /* istanbul ignore else: No need to simulate unexpected Dynamo errors */
-    if (error.code === 'ResourceNotFoundException') {
-      throw new Error(`Table ${TableName} doesn't exists`)
-    }
-
-    /* istanbul ignore next: No need to simulate unexpected Dynamo errors */
-    throw new ResourceUpdateError(error, query, attributes)
-  }
-
-  return result.Attributes
-}
-
-module.exports = updateItem
+module.exports = buildUpdateParameters

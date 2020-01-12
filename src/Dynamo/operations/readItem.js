@@ -5,18 +5,18 @@ const indexItems    = require('./indexItems')
 const getPrimaryKey = require('../helpers/getPrimaryKey')
 const ResourceNotFoundError = require('../../errors/ResourceNotFoundError')
 
-const readItem = async(client, tableKey, query, options) => {
+const readItem = async(client, queryKey, query, options) => {
   let item
 
-  const shouldGetItem = tableKey.isPrimary && !!getPrimaryKey(tableKey, query, false)
+  const shouldGetItem = queryKey.isPrimary && !!getPrimaryKey(queryKey, query, false)
 
   if (shouldGetItem) {
-    item = await getItem(client, tableKey, query, options)
+    item = await getItem(client, queryKey, query, options)
 
   } else {
     options = { ...options, limit: 1 }
 
-    const { items } = await indexItems(client, tableKey, query, options)
+    const { items } = await indexItems(client, queryKey, query, options)
 
     item = items[0]
 

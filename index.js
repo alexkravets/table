@@ -1,9 +1,9 @@
 'use strict'
 
 module.exports = {
-  File:                  require('./lib/file'),
-  Dynamo:                require('./lib/dynamo'),
-  ResourceUpdateError:   require('./lib/errors/ResourceUpdateError'),
-  ResourceExistsError:   require('./lib/errors/ResourceExistsError'),
-  ResourceNotFoundError: require('./lib/errors/ResourceNotFoundError')
+  File:                  require('./src/File'),
+  Dynamo:                require('./src/Dynamo'),
+  ResourceUpdateError:   require('./src/errors/ResourceUpdateError'),
+  ResourceExistsError:   require('./src/errors/ResourceExistsError'),
+  ResourceNotFoundError: require('./src/errors/ResourceNotFoundError')
 }

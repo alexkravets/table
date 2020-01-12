@@ -1,6 +1,6 @@
 'use strict'
 
-const Dynamo = require('lib/dynamo')
+const Dynamo = require('src/Dynamo')
 const { expect } = require('chai')
 
 const expectError = async(fn, key, value) => {
@@ -18,6 +18,7 @@ const expectError = async(fn, key, value) => {
 }
 
 module.exports = {
+  wait:                             require('./wait'),
   DynamoDocument:                   require('./DynamoDocument'),
   DynamoDocumentCustomPartitionKey: require('./DynamoDocumentCustomPartitionKey'),
   Dynamo,

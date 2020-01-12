@@ -1,7 +1,7 @@
 'use strict'
 
 const { expect }          = require('chai')
-const ResourceUpdateError = require('lib/errors/ResourceUpdateError')
+const ResourceUpdateError = require('src/errors/ResourceUpdateError')
 
 describe('ResourceUpdateError', () => {
   it('creates item', async() => {
