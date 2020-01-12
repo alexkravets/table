@@ -6,6 +6,7 @@ const {
   DynamoDocumentCustomPartitionKey } = require('./helpers')
 
 let itemId
+
 before(async() => {
   await DynamoDocument.resetCollection()
   await DynamoDocumentCustomPartitionKey.resetCollection()

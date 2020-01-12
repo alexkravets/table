@@ -10,7 +10,12 @@ describe('.dynamo', () => {
 
 describe('.documentId(attributes)', () => {
   it('returns UUID by default', () => {
-    const Document = Dynamo(class {})
+    const Document = Dynamo(class {
+      static get documentIdKey() {
+        return 'id'
+      }
+    })
+
     let id = Document.documentId()
     expect(id).to.exist
 

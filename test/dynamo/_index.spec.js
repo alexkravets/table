@@ -15,7 +15,7 @@ before(async() => {
     lastName:   'Kravets',
     parameters: {
       size:  1,
-      tags:  [ 'tag2' ],
+      tags:  [ 'tag2', 'tag4' ],
       shirt: { size: 'L' }
     }
   })
@@ -93,8 +93,8 @@ it('returns docs, count', async() => {
 
   const [ doc ] = docs
   expect(doc).to.include({
-    firstName: 'Alexander',
-    lastName:  'Popov'
+    firstName: 'Stanislav',
+    lastName:  'Kravets'
   })
 })
 
@@ -143,7 +143,7 @@ it('returns docs starting from exclusiveStartKey', async() => {
   const { docs } = await DynamoDocument._index({}, { limit: 1, exclusiveStartKey })
   const [ doc ]  = docs
 
-  expect(doc.firstName).to.equal('Stanislav')
+  expect(doc.firstName).to.equal('Alexander')
 })
 
 it('returns docs filtered by query', async() => {
@@ -161,7 +161,7 @@ it('supports query with attributes projection', async() => {
   const [ doc ]  = docs
 
   expect(doc.firstName).to.be.undefined
-  expect(doc.lastName).to.equal('Popov')
+  expect(doc.lastName).to.equal('Kravets')
   expect(doc.parameters).not.to.be.undefined
   expect(doc.parameters.tags).not.to.be.undefined
   expect(doc.parameters.tags.length).to.equal(1)
@@ -192,11 +192,12 @@ it('supports :contains option in query', async() => {
 })
 
 it('supports :not option in query', async() => {
-  const { docs, count } = await DynamoDocument._index({ 'parameters.tags:not': 'tag2' }, { limit: 2 })
-  const [ doc ] = docs
+  const { docs, count } = await DynamoDocument._index({ 'parameters.size:not': 2 })
+  const [ doc1, doc2 ] = docs
 
-  expect(count).to.equal(2)
-  expect(doc.parameters.tags).not.to.include('tag2')
+  expect(count).to.equal(3)
+  expect(doc1.parameters.size).not.equal(2)
+  expect(doc2.parameters.tags).not.equal(2)
 })
 
 it('supports :gt option in query', async() => {
@@ -228,7 +229,7 @@ it('throws Error if partition key is missing in query', async() => {
 it('throws Error if missing index is provided via options', async() => {
   await expectError(() => DynamoDocumentCustomPartitionKey._index({}, {
     indexName: 'missingIndex'
-  }), 'message', 'Index "missingIndex" is not defined')
+  }), 'message', 'is not defined')
 })
 
 it('throws Error if table does not exist', async() => {

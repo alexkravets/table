@@ -8,14 +8,16 @@ const {
 } = require('./helpers')
 
 let itemId
+
 before(async() => {
   await DynamoDocument.resetCollection()
   await DynamoDocumentCustomPartitionKey.resetCollection()
 
   const attributes = {
     unit:      'UNIT_1',
-    firstName: 'Stanislav',
     lastName:  'Kravets',
+    firstName: 'Stanislav',
+    createdAt: new Date().toJSON(),
     parameters: {
       tags:  [ 'tag1', 'tag2' ],
       shirt: { size: 'L' }
@@ -47,6 +49,13 @@ it('returns item via query and custom index', async() => {
   expect(item.firstName).to.equal('Stanislav')
 })
 
+it('returns item via sort key and custom index', async() => {
+  const { createdAt } = await DynamoDocument._read({ id: itemId })
+
+  const item = await DynamoDocument._read({ createdAt }, { indexName: 'defaultIndex' })
+  expect(item.id).to.eql(itemId)
+})
+
 it('returns item with attributes projection', async() => {
   const item = await DynamoDocument._read({ id: itemId }, {
     projection: [ 'lastName', 'parameters.tags[1]' ]
@@ -61,6 +70,13 @@ it('returns item with attributes projection', async() => {
   expect(item.parameters.shirt).to.be.undefined
 })
 
+it('returns first item if query is empty', async() => {
+  const item = await DynamoDocument._read({})
+
+  expect(item.firstName).to.equal('Stanislav')
+  expect(item.lastName).to.equal('Kravets')
+})
+
 it('throws ResourceNotFoundError if item is not found', async() => {
   await expectError(() => DynamoDocument._read({ id: 'ITEM_ID' }), 'code',
     'ResourceNotFoundError')
@@ -69,11 +85,6 @@ it('throws ResourceNotFoundError if item is not found', async() => {
 it('throws ResourceNotFoundError if item is not found by firstName', async() => {
   await expectError(() => DynamoDocument._read({ firstName: 'ITEM_ID' }), 'code',
     'ResourceNotFoundError')
-})
-
-it('throws ValidationException if ID is undefined in query', async() => {
-  await expectError(() => DynamoDocument._read({ id: undefined }), 'code',
-    'ValidationException')
 })
 
 it('throws Error if partition key is not defined in query', async() => {

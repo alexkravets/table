@@ -1,6 +1,6 @@
 'use strict'
 
-const Dynamo     = require('lib/dynamo')
+const Dynamo = require('lib/dynamo')
 const { expect } = require('chai')
 
 const expectError = async(fn, key, value) => {
@@ -17,37 +17,10 @@ const expectError = async(fn, key, value) => {
   throw new Error('Expected exception has not been thrown')
 }
 
-const DynamoDocument = class extends Dynamo(class {}) {
-  static documentId({ lastName }) {
-    return lastName
-  }
-
-  static get indexes() {
-    return {
-      ...super.indexes,
-      unitIndex: { partitionKey: 'unit' }
-    }
-  }
-}
-
-const DynamoDocumentCustomPartitionKey = class extends Dynamo(class {}) {
-  static documentId({ lastName, firstName }) {
-    return `${lastName}#${firstName}`
-  }
-
-  static get tablePartitionKey() {
-    return 'unit'
-  }
-
-  static get indexes() {
-    return {}
-  }
-}
-
 module.exports = {
+  DynamoDocument:                   require('./DynamoDocument'),
+  DynamoDocumentCustomPartitionKey: require('./DynamoDocumentCustomPartitionKey'),
   Dynamo,
   expect,
-  expectError,
-  DynamoDocument,
-  DynamoDocumentCustomPartitionKey
+  expectError
 }
