@@ -169,6 +169,15 @@ const Dynamo = Document => class extends Document {
 
     return deleteItem(client, queryKey, query)
   }
+
+  get _getQuery() {
+    const query = super._getQuery
+
+    const { tablePartitionKey } = this.constructor
+    query[tablePartitionKey] = this.attributes[tablePartitionKey]
+
+    return query
+  }
 }
 
 module.exports = Dynamo
