@@ -1,6 +1,6 @@
 'use strict'
 
-const Dynamo = require('src/Dynamo')
+const Dynamo = require('src/adaptors/Dynamo')
 const { expect } = require('chai')
 
 const expectError = async(fn, key, value) => {

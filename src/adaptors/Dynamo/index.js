@@ -42,9 +42,11 @@ const Dynamo = Document => class extends Document {
   static get tablePrimaryKey() {
     return {
       isPrimary:    true,
+      idKey:        this.documentIdKey,
       tableName:    this.tableName,
       partitionKey: this.tablePartitionKey,
-      sortKey:      this.tableSortKey
+      sortKey:      this.tableSortKey,
+      resourceName: this.resourceName
     }
   }
 
@@ -113,22 +115,20 @@ const Dynamo = Document => class extends Document {
   }
 
   static async _create(attributes) {
-    const {
-      tableName,
-      resourceName,
-      documentIdKey,
-      tablePartitionKey
-    } = this
-    attributes = this._cloneAttributes(attributes)
+    const { resourceName } = this
 
+    const queryKey = this._getQueryKey()
+    const { partitionKey, sortKey: documentIdKey } = queryKey
+
+    attributes = this._cloneAttributes(attributes)
     attributes[documentIdKey] = this.documentId(attributes)
 
-    const hasDefaultTablePartitionKey = tablePartitionKey === 'resourceName'
+    const hasDefaultTablePartitionKey = partitionKey === 'resourceName'
     if (hasDefaultTablePartitionKey) {
       attributes.resourceName = resourceName
     }
 
-    await createItem(client, resourceName, documentIdKey, tableName, attributes)
+    await createItem(client, queryKey, attributes)
 
     return attributes
   }

@@ -1,31 +1,35 @@
 'use strict'
 
+describe.only('Adaptors', () => {
+  require('./adaptors')
+})
+
 describe('Errors', () => {
   require('./errors/ResourceUpdateError.spec')
 })
 
 describe('Dynamo', () => {
   describe('_create(attributes)', () => {
-    require('./dynamo/_create.spec')
+    require('./adaptors/_Dynamo/_create.spec')
   })
 
   describe('_index(query, options)', () => {
-    require('./dynamo/_index.spec')
+    require('./adaptors/_Dynamo/_index.spec')
   })
 
   describe('_read(query, options)', () => {
-    require('./dynamo/_read.spec')
+    require('./adaptors/_Dynamo/_read.spec')
   })
 
   describe('_update(query, attributes)', () => {
-    require('./dynamo/_update.spec')
+    require('./adaptors/_Dynamo/_update.spec')
   })
 
   describe('_delete(query, attributes)', () => {
-    require('./dynamo/_delete.spec')
+    require('./adaptors/_Dynamo/_delete.spec')
   })
 
   describe('> Document', () => {
-    require('./dynamo/Document.spec')
+    require('./adaptors/_Dynamo/Document.spec')
   })
 })

@@ -1,6 +1,6 @@
 'use strict'
 
-const Dynamo = require('src/Dynamo')
+const Dynamo = require('src/adaptors/Dynamo')
 
 const DynamoDocumentCustomPartitionKey = class extends Dynamo(class {}) {
   static get documentIdKey() {

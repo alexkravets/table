@@ -1,11 +1,13 @@
 'use strict'
 
-const getPrimaryKey           = require('./getPrimaryKey')
+const buildItemKey = require('./buildItemKey')
 const getProjectionExpression = require('./getProjectionExpression')
 
 const buildGetParameters = (queryKey, query, options) => {
+  const Key = buildItemKey('Read', queryKey, query)
+
   const parameters = {
-    Key:       getPrimaryKey(queryKey, query),
+    Key,
     TableName: queryKey.tableName,
   }
 

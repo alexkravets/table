@@ -1,13 +1,13 @@
 'use strict'
 
-class ResourceNotFoundError extends Error {
-  constructor(query, options = {}) {
-    const parameters = JSON.stringify({ query, options }, null, 2)
-    super(`Resource not found: ${parameters}`)
-  }
+const CommonError = require('./CommonError')
 
-  get code() {
-    return this.constructor.name
+class ResourceNotFoundError extends CommonError {
+  constructor(resourceName, context) {
+    super(
+      'ResourceNotFoundError',
+      `Resource "${resourceName}" not found`,
+      context)
   }
 }
 

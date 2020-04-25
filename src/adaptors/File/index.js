@@ -21,7 +21,7 @@ const File = Component => class extends Component {
     const attributes = find(this.sourceMap, query)
 
     if (!attributes) {
-      throw new ResourceNotFoundError(this.name, query)
+      throw new ResourceNotFoundError(this.name, { query })
     }
 
     return new this(context, attributes)

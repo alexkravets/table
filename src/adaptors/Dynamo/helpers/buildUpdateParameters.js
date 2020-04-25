@@ -1,20 +1,17 @@
 'use strict'
 
-const endsWith      = require('lodash.endswith')
-const getPrimaryKey = require('../helpers/getPrimaryKey')
+const omit         = require('lodash.omit')
+const endsWith     = require('lodash.endswith')
+const buildItemKey = require('../helpers/buildItemKey')
 const getConditionExpression = require('../helpers/getConditionExpression')
 
 const buildUpdateParameters = (queryKey, query, attributes) => {
   const { tableName, partitionKey } = queryKey
 
-  if (attributes[partitionKey]) {
-    query[partitionKey] = attributes[partitionKey]
-    delete attributes[partitionKey]
-  }
+  // TODO: Check if we can update many items here:
+  const Key = buildItemKey('Update', queryKey, query)
 
-  const Key = getPrimaryKey(queryKey, query)
-  delete query[partitionKey]
-
+  query = omit(query, [ partitionKey ])
   const parameters = getConditionExpression(query)
 
   parameters.Key          = Key
