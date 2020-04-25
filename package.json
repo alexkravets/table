@@ -1,11 +1,11 @@
 {
-  "name": "@slatestudio/common-storage",
-  "version": "2.3.1",
+  "name": "@kravc/common-storage",
+  "version": "2.3.2",
   "description": "Common storage adaptors for common service documents",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "http://github.com/slate-studio/common-storage.git"
+    "url": "http://github.com/alexkravets/common-storage.git"
   },
   "directories": {
     "src": "src"
@@ -13,10 +13,10 @@
   "scripts": {
     "test": "eslint src/ test/ && NODE_PATH=./ NODE_CONFIG_DIR=./test/config nyc --reporter html --reporter text mocha --exit"
   },
-  "author": "Alexander Kravets <alex@slatestudio.com>",
+  "author": "Alexander Kravets <a@kra.vc>",
   "license": "ISC",
   "dependencies": {
-    "config": "^3.0.1",
+    "config": "^3.3.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.endswith": "^4.2.1",
     "lodash.find": "^4.6.0",
@@ -25,13 +25,13 @@
     "lodash.keyby": "^4.6.0",
     "lodash.pickby": "^4.6.0",
     "lodash.uniq": "^4.5.0",
-    "uuid": "^3.3.2"
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "aws-sdk": "^2.395.0",
-    "chai": "^4.1.2",
-    "eslint": "^5.12.1",
-    "mocha": "^5.2.0",
-    "nyc": "^14.1.1"
+    "aws-sdk": "^2.663.0",
+    "chai": "^4.2.0",
+    "eslint": "^6.8.0",
+    "mocha": "^7.1.1",
+    "nyc": "^15.0.1"
   }
 }
