@@ -1,13 +1,13 @@
 'use strict'
 
-const uuid       = require('uuid/v4')
-const config     = require('./helpers/config')
-const readItem   = require('./operations/readItem')
-const cloneDeep  = require('lodash.clonedeep')
-const indexItems = require('./operations/indexItems')
-const createItem = require('./operations/createItem')
-const deleteItem = require('./operations/deleteItem')
-const updateItem = require('./operations/updateItem')
+const config       = require('./helpers/config')
+const readItem     = require('./operations/readItem')
+const cloneDeep    = require('lodash.clonedeep')
+const indexItems   = require('./operations/indexItems')
+const createItem   = require('./operations/createItem')
+const deleteItem   = require('./operations/deleteItem')
+const updateItem   = require('./operations/updateItem')
+const { v4: uuid } = require('uuid')
 const createTableSchema = require('./helpers/createTableSchema')
 
 const { AWS, options, tablePrefix } = config()

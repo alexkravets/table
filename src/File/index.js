@@ -1,10 +1,10 @@
 'use strict'
 
-const fs    = require('fs')
-const uuid  = require('uuid/v1')
-const find  = require('lodash.find')
-const keyBy = require('lodash.keyby')
-const rootPath = process.cwd()
+const fs           = require('fs')
+const find         = require('lodash.find')
+const keyBy        = require('lodash.keyby')
+const rootPath     = process.cwd()
+const { v1: uuid } = require('uuid')
 const { safeLoad: load } = require('js-yaml')
 
 const ResourceNotFoundError = require('../errors/ResourceNotFoundError')
