@@ -160,7 +160,7 @@ it('returns docs starting from exclusiveStartKey', async() => {
   expect(doc.firstName).to.equal('Alexander')
 })
 
-it('returns docs filtered by query', async() => {
+it.skip('returns docs filtered by query', async() => {
   const { docs, count, lastEvaluatedKey } = await DynamoDocument._index({ firstName: 'Alexander' }, { sort: 'asc', limit: 3 })
   const [ doc ] = docs
 

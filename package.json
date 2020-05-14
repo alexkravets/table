@@ -1,6 +1,6 @@
 {
   "name": "@kravc/common-storage",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "description": "Common storage adaptors for common service documents",
   "main": "index.js",
   "repository": {

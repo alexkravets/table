@@ -33,10 +33,11 @@ const indexItems = async(client, queryKey, query, options) => {
     items = [ ...items, ...chunk ]
     count = items.length
 
-    if (hasLimit && count > limit) {
-      items = items.slice(0, limit)
-      count = limit
-    }
+    // NOTE: Cutting results leads to invalid LastEvaluatedKey:
+    // if (hasLimit && count > limit) {
+    //   items = items.slice(0, limit)
+    //   count = limit
+    // }
 
     lastEvaluatedKey    = LastEvaluatedKey
     isNextChunkRequired = (hasLimit && count < limit) && LastEvaluatedKey
