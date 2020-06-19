@@ -4,7 +4,7 @@ const ResourceExistsError     = require('../../../errors/ResourceExistsError')
 const InvalidAttributesError  = require('../../../errors/InvalidAttributesError')
 const CollectionNotFoundError = require('../../../errors/CollectionNotFoundError')
 
-const createItem = async(client, queryKey, attributes) => {
+const createItem = async (client, queryKey, attributes) => {
   const { tableName: TableName, partitionKey, idKey, resourceName } = queryKey
 
   const isMissingKeyAttributes = !attributes[partitionKey] || !attributes[idKey]

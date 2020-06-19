@@ -10,15 +10,15 @@ const identity = require('lodash.identity')
 const credentialsPath = `${homedir}/.aws/credentials`
 const hasCredentials  = fs.existsSync(credentialsPath)
 
-const stage   = config.get('provider.stage')
-const region  = config.get('provider.region')
-const service = config.get('service')
+// const stage   = config.get('provider.stage')
+// const region  = config.get('provider.region')
+// const service = config.get('service')
 
-const endpoint = get(config, 'dynamodb.endpoint')
+// const endpoint = get(config, 'dynamodb.endpoint')
 
 module.exports = () => {
-  const AWS     = require('aws-sdk')
-  const options = pickBy({ region, endpoint }, identity)
+  // const AWS     = require('aws-sdk')
+  // const options = pickBy({ region, endpoint }, identity)
 
   /* istanbul ignore else: Credentials are not used in AWS environment */
   if (hasCredentials) {
@@ -26,7 +26,7 @@ module.exports = () => {
     options.credentials = new AWS.SharedIniFileCredentials({ profile })
   }
 
-  const tablePrefix = `${service}-${stage}`
+  // const tablePrefix = `${service}-${stage}`
 
   return { AWS, options, tablePrefix }
 }

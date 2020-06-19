@@ -2,18 +2,18 @@
 
 class CommonError extends Error {
   constructor(code, message, context) {
-    if (context) {
-      const contextJson = JSON.stringify(context, null, 2)
-      message = `${message} ${contextJson}`
-    }
-
     super(message)
 
-    this._code = code
+    this._code    = code
+    this._context = context
   }
 
   get code() {
     return this._code
+  }
+
+  get context() {
+    return this._context
   }
 }
 
