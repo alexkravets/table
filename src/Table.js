@@ -1,10 +1,16 @@
 'use strict'
 
-const get         = require('lodash.get')
-const AWS         = require('aws-sdk')
-const createItem  = require('./helpers/createItem')
-const { homedir } = require('os')
-const createTable = require('./helpers/createTable')
+const get            = require('lodash.get')
+const AWS            = require('aws-sdk')
+const omit           = require('lodash.omit')
+const getItem        = require('./helpers/getItem')
+const buildKey       = require('./helpers/buildKey')
+const listItems      = require('./helpers/listItems')
+const deleteItem     = require('./helpers/deleteItem')
+const createItem     = require('./helpers/createItem')
+const updateItem     = require('./helpers/updateItem')
+const { homedir }    = require('os')
+const createTable    = require('./helpers/createTable')
 const { existsSync } = require('fs')
 
 const HOME            = homedir()
@@ -12,13 +18,12 @@ const LOCAL_REGION    = 'local'
 const LOCAL_ENDPOINT  = 'http://0.0.0.0:8000'
 const DEFAULT_PROFILE = 'private'
 
+const DEFAULT_INDEXES     = {}
+const DEFAULT_TABLE_NAME  = 'default'
 const DEFAULT_PRIMARY_KEY = {
-  tableName:    'default',
   partitionKey: 'resourceName',
   sortKey:      'id'
 }
-
-const DEFAULT_INDEXES = {}
 
 const hasAwsCredentials = existsSync(`${HOME}/.aws/credentials`)
 
@@ -53,12 +58,14 @@ class Table {
     }
 
     const indexes    = get(options, 'indexes', DEFAULT_INDEXES)
+    const tableName  = get(options, 'tableName', DEFAULT_TABLE_NAME)
     const primaryKey = get(options, 'primaryKey', DEFAULT_PRIMARY_KEY)
 
     this._client    = new AWS.DynamoDB.DocumentClient(config)
     this._rawClient = new AWS.DynamoDB(config)
 
     this._indexes      = indexes
+    this._tableName    = tableName
     this._primaryKey   = primaryKey
     this._tableOptions = tableOptions
   }
@@ -66,6 +73,7 @@ class Table {
   create() {
     return createTable(
       this._rawClient,
+      this._tableName,
       this._primaryKey,
       this._indexes,
       this._tableOptions
@@ -73,7 +81,7 @@ class Table {
   }
 
   destroy() {
-    const TableName = 'default'
+    const TableName = this._tableName
     return this._rawClient.deleteTable({ TableName }).promise()
   }
 
@@ -92,83 +100,91 @@ class Table {
     await this.create()
   }
 
-  async createItem(resourceName, attributes) {
-    await createItem(this._client, this._primaryKey, resourceName, attributes)
+  createItem(attributes) {
+    this._verifyKey('Create', attributes)
 
-    return attributes
+    return createItem(this._client, this._tableName, this._primaryKey, attributes)
   }
 
-  // async indexItems(resourceName, query = {}, options = {}) {
-  //   let { indexName } = options
-  //   const hasDefaultIndex = !!this.indexes.defaultIndex
+  readItem(attributes, options = {}) {
+    const { index: indexName, ...otherOptions } = options
+    const key = this._getKey('Get', attributes, indexName)
 
-  //   if (!indexName && hasDefaultIndex) { indexName = 'defaultIndex' }
+    return getItem(this._client, this._tableName, key, attributes, otherOptions)
+  }
 
-  //   const queryKey = this._getQueryKey(indexName)
-  //   query = this._cloneQuery(query, queryKey.partitionKey)
+  deleteItem(attributes) {
+    const key = this._getKey('Delete', attributes)
 
-  //   const { items, ...rest } = await indexItems(client, queryKey, query, options)
+    // TODO: Verify requirement for omit function:
+    const { partitionKey } = this._primaryKey
+    attributes = omit(attributes, [ partitionKey ])
 
-  //   return { items, ...rest }
-  // }
+    return deleteItem(this._client, this._tableName, key, attributes)
+  }
 
-  // readItem(resourceName, query, options = {}) {
-  //   const queryKey = this._getQueryKey(options.indexName)
-  //   query = this._cloneQuery(query, queryKey.partitionKey)
+  updateItem(query, attributes) {
+    const key = this._getKey('Delete', query)
 
-  //   return readItem(client, queryKey, query, options)
-  // }
+    // TODO: Verify requirement for omit function:
+    const { partitionKey } = this._primaryKey
+    query = omit(query, [ partitionKey ])
 
-  // updateItem(resourceName, query, attributes) {
-  //   const queryKey = this._getQueryKey()
+    return updateItem(this._client, this._tableName, key, query, attributes)
 
-  //   query      = this._cloneQuery(query)
-  //   attributes = cloneDeep(attributes)
+    // const { resourceName, partitionKey, idKey } = queryKey
 
-  //   return updateItem(client, queryKey, query, attributes)
-  // }
+    // const shouldUpdatePartitionKey = !!attributes[partitionKey]
+    // const shouldUpdateId = !!attributes[idKey]
 
-  // deleteItem(resourceName, query) {
-  //   const queryKey = this._getQueryKey()
-  //   query = this._cloneQuery(query)
+    // if (shouldUpdatePartitionKey) {
+    //   const message = `Update of partition key "${partitionKey}" for` +
+    //     ` "${resourceName}" is restricted`
 
-  //   return deleteItem(client, queryKey, query)
-  // }
+    //   throw new InvalidAttributesError(message, { queryKey, query, attributes })
+    // }
 
-  // static _getQueryKey(indexName) {
-  //   if (!indexName) { return this.tablePrimaryKey }
+    // if (shouldUpdateId) {
+    //   throw new InvalidAttributesError(
+    //     `Update of ID key "${idKey}" for "${resourceName}" is restricted`,
+    //     { queryKey, query, attributes })
+    // }
+  }
 
-  //   const { indexes, tableName, tablePartitionKey } = this
+  listItems(query = {}, options = {}) {
+    const indexKey = this._getIndexKey(options.index)
 
-  //   const tableKey = indexes[indexName]
+    return listItems(this._client, this._tableName, indexKey, query, options)
+  }
 
-  //   if (!tableKey) {
-  //     throw new Error(`Index "${tableName}.${indexName}" is not defined`)
-  //   }
+  // ---
 
-  //   return { tableName, indexName, partitionKey: tablePartitionKey, ...tableKey }
-  // }
+  // TODO: This should auto-detect index based on attributes:
+  _getIndexKey(indexName = 'NONE') {
+    const indexKey = this._indexes[indexName] || this._primaryKey
 
-  // static _cloneQuery(query, partitionKey = this.tablePartitionKey) {
-  //   query = cloneDeep(query)
+    if (!indexKey) {
+      throw new Error(`Index "${this._tableName}.${indexName}" is not defined`)
+    }
 
-  //   const isDefaultPartitionKey = partitionKey === 'resourceName'
+    const isSecondaryLocalIndex = !indexKey.partitionKey
 
-  //   if (!isDefaultPartitionKey) {
-  //     return query
-  //   }
+    if (isSecondaryLocalIndex) {
+      indexKey.partitionKey = this._primaryKey.partitionKey
+    }
 
-  //   return { resourceName: this.resourceName, ...query }
-  // }
+    return indexKey
+  }
 
-  // get _getQuery() {
-  //   const query = super._getQuery
+  _getKey(methodName, attributes, indexName) {
+    const indexKey = this._getIndexKey(indexName)
 
-  //   const { tablePartitionKey } = this.constructor
-  //   query[tablePartitionKey] = this.attributes[tablePartitionKey]
+    return buildKey(methodName, indexKey, attributes)
+  }
 
-  //   return query
-  // }
+  _verifyKey(...params) {
+    this._getKey(...params)
+  }
 }
 
 module.exports = Table

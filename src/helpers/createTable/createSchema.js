@@ -3,7 +3,9 @@
 const getSecondaryIndexes     = require('./getSecondaryIndexes')
 const getAttributeDefinitions = require('./getAttributeDefinitions')
 
-const createSchema = ({ tableName: TableName, partitionKey, sortKey }, indexes, options) => {
+const createSchema = (TableName, primaryKey, indexes, options) => {
+  const { partitionKey, sortKey } = primaryKey
+
   const KeySchema = [
     { KeyType: 'HASH',  AttributeName: partitionKey },
     { KeyType: 'RANGE', AttributeName: sortKey }

@@ -13,7 +13,7 @@ const buildItemKey = (intent, queryKey, query, shouldThrowError = true) => {
   if (!isMissingKeyAttributes) {
     if (!shouldThrowError) { return }
 
-    const message = `${intent} item query for "${resourceName}" should` +
+    const message = `"${intent}" item query for "${resourceName}" should` +
       ` include "${partitionKey}" and "${sortKey}" attributes`
 
     throw new InvalidQueryError(
