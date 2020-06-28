@@ -5,7 +5,7 @@ const { expect, expectError } = require('./helpers')
 
 const partition = 'Profile'
 
-describe('table.readItem(attributes, options = {})', () => {
+describe('table.getItem(attributes, options = {})', () => {
   let table
 
   const id = 'LISA'
@@ -27,12 +27,12 @@ describe('table.readItem(attributes, options = {})', () => {
   })
 
   it('returns item', async () => {
-    const item = await table.readItem({ id, partition })
+    const item = await table.getItem({ id, partition })
     expect(item).to.exist
   })
 
   it('returns item with projected attributes', async () => {
-    const item = await table.readItem({ id, partition }, {
+    const item = await table.getItem({ id, partition }, {
       projection: [ 'name', 'pets.cats[1]' ],
       consistentRead: true
     })
@@ -45,14 +45,14 @@ describe('table.readItem(attributes, options = {})', () => {
   })
 
   it('returns "undefined" if not found', async () => {
-    const item = await table.readItem({ id: 'NONE', partition })
+    const item = await table.getItem({ id: 'NONE', partition })
     expect(item).to.be.undefined
   })
 
   it('throws error if table not found', async () => {
     await table.destroy()
 
-    const error = await expectError(() => table.readItem({ id, partition }))
+    const error = await expectError(() => table.getItem({ id, partition }))
     expect(error.message).to.include('Table "kravc-table-test" does not exist')
   })
 })

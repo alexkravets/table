@@ -26,7 +26,7 @@ describe('table.deleteItem(attributes)', () => {
     const isDeleted = await table.deleteItem({ id, partition })
     expect(isDeleted).to.be.true
 
-    const item = await table.readItem({ id, partition })
+    const item = await table.getItem({ id, partition })
     expect(item).to.not.exist
   })
 

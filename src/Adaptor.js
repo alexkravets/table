@@ -1,48 +1,78 @@
 'use strict'
 
 const Table = require('./Table')
-// const { ulid }  = require('ulid')
-// const cloneDeep = require('lodash.clonedeep')
-// const ResourceExistsError = require('./errors/ResourceExistsError')
-// const ResourceNotFoundError = require('../errors/ResourceNotFoundError')
 
 const Adaptor = (Document, config) => {
   const table = new Table(config)
 
+  const {
+    sortKey:      ID_KEY,
+    partitionKey: PARTITION_KEY,
+  } = table.primaryKey
+
   return class extends Document {
-    static get partitionKey() {
+    static get table() {
+      return table
+    }
+
+    static get idKey() {
+      return ID_KEY
+    }
+
+    static get partition() {
       return this.name
     }
 
-    static async _create(attributes) {
-      // attributes = cloneDeep(attributes)
+    static _create(attributes) {
+      const hasPartition = !!attributes[PARTITION_KEY]
 
-      // attributes[this.idKey]  = this.documentId(attributes)
-      // attributes.resourceName = this.resourceName
+      if (!hasPartition) {
+        attributes[PARTITION_KEY] = this.partition
+      }
 
-      await table.createItem(attributes)
-
-      // const isCreated = await table.createItem(attributes)
-
-      // if (!isCreated) {
-      //   throw new ResourceExistsError(this.resourceName, { attributes })
-      // }
-
-      return attributes
+      return table.createItem(attributes)
     }
 
-    // TODO: Looks like ResourceNotFoundError should be extracted to the
-    //       Document level or Operation > Read level:
-    // if (!item) {
-    //   ResourceNotFoundError(this.resourceName, { query, options })
-    // }
+    static _index(query = {}, options = {}) {
+      query = this._getPartitionQuery(query, options.index)
 
-    static async _read(query, options) {
-      return table.readItem(query, options)
+      return table.listItems(query, options)
     }
 
-    static async _delete(query) {
+    static _read(query, options = {}) {
+      query = this._getPartitionQuery(query, options.index)
+
+      return table.getItem(query, options)
+    }
+
+    static _update(query, attributes) {
+      query = this._getPartitionQuery(query)
+
+      return table.updateItem(query, attributes)
+    }
+
+    static _delete(query) {
+      query = this._getPartitionQuery(query)
+
       return table.deleteItem(query)
+    }
+
+    static _getPartitionQuery(query, indexName) {
+      const hasIndex     = !!indexName
+      const hasPartition = !!query[PARTITION_KEY]
+
+      if (hasIndex) {
+        return query
+      }
+
+      if (hasPartition) {
+        return query
+      }
+
+      return {
+        [PARTITION_KEY]: this.partition,
+        ...query
+      }
     }
   }
 }

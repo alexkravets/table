@@ -74,6 +74,10 @@ class Table {
     this._tableOptions = tableOptions
   }
 
+  get primaryKey() {
+    return this._primaryKey
+  }
+
   create() {
     return createTable(
       this._rawClient,
@@ -110,7 +114,7 @@ class Table {
     return createItem(this._client, this._tableName, this._primaryKey, attributes)
   }
 
-  readItem(query, options = {}) {
+  getItem(query, options = {}) {
     const key = this._getKey('Get', query)
 
     return getItem(this._client, this._tableName, key, query, options)
@@ -161,9 +165,6 @@ class Table {
     return listItems(this._client, this._tableName, indexKey, query, { indexName, ...otherOptions })
   }
 
-  // ---
-
-  // TODO: This should auto-detect index based on attributes:
   _getIndexKey(indexName) {
     let indexKey = this._primaryKey
 

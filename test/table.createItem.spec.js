@@ -1,7 +1,7 @@
 'use strict'
 
 const { Table } = require('src')
-const { config, expect, expectError } = require('./helpers')
+const { expect, expectError } = require('./helpers')
 
 const partition = 'Profile'
 
@@ -9,7 +9,7 @@ describe('table.createItem(attributes)', () => {
   let table
 
   before(async () => {
-    table = new Table(config)
+    table = new Table()
     await table.reset()
   })
 
