@@ -110,20 +110,20 @@ class Table {
     return createItem(this._client, this._tableName, this._primaryKey, attributes)
   }
 
-  readItem(attributes, options = {}) {
-    const key = this._getKey('Get', attributes)
+  readItem(query, options = {}) {
+    const key = this._getKey('Get', query)
 
-    return getItem(this._client, this._tableName, key, attributes, options)
+    return getItem(this._client, this._tableName, key, query, options)
   }
 
-  deleteItem(attributes) {
-    const key = this._getKey('Delete', attributes)
+  deleteItem(query) {
+    const key = this._getKey('Delete', query)
 
     // TODO: Verify requirement for omit function:
     const { partitionKey } = this._primaryKey
-    attributes = omit(attributes, [ partitionKey ])
+    query = omit(query, [ partitionKey ])
 
-    return deleteItem(this._client, this._tableName, key, attributes)
+    return deleteItem(this._client, this._tableName, key, query)
   }
 
   updateItem(query, attributes) {

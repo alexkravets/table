@@ -25,7 +25,17 @@ describe('table.listItems(query = {}, options = {})', () => {
     for (const index of [ ...Array(LIMIT + 1).keys() ]) {
       const id         = ulid()
       const isEnabled  = index <= 15
-      const attributes = { partition, id, name: `Name-${index}`, isEnabled }
+      const attributes = {
+        id,
+        partition,
+        isEnabled,
+        age:  index,
+        name: `Name-${index}`,
+        pets: {
+          cats: [ `Bonya-${index}`, `Zoe-${index}` ]
+        }
+      }
+
       await table.createItem(attributes)
     }
   })
@@ -83,6 +93,33 @@ describe('table.listItems(query = {}, options = {})', () => {
     expect(result).to.exist
     expect(result.items).to.have.lengthOf(1)
     expect(result.items[0].name).to.eql('Name-20')
+  })
+
+  it('supports :gt filter', async () => {
+    const result = await table.listItems({ partition, 'age:gt': 5 })
+    expect(result.items[0].age).to.eql(6)
+  })
+
+  it('supports :lt filter', async () => {
+    const result = await table.listItems({ partition, 'age:lt': 5 }, { sort: 'desc' })
+    expect(result.items[0].age).to.eql(4)
+  })
+
+  it('supports :not filter', async () => {
+    const result = await table.listItems({ partition, 'age:not': 0 })
+    expect(result.items[0].age).to.eql(1)
+  })
+
+  it('supports :contains filter', async () => {
+    const result = await table.listItems({ partition, 'pets.cats:contains': 'Zoe-2' })
+    expect(result.items[0].name).to.eql('Name-2')
+  })
+
+  it('supports :in filter', async () => {
+    const result = await table.listItems({ partition, 'name': [ 'Name-1', 'Name-2' ] })
+    expect(result.count).to.eql(2)
+    expect(result.items[0].name).to.eql('Name-1')
+    expect(result.items[1].name).to.eql('Name-2')
   })
 
   it('throws error if index not found', async () => {

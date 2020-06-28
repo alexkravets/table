@@ -1,16 +1,12 @@
 'use strict'
 
 // NOTE: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html
-const buildConditionExpression = (query, sortKey) => {
+const buildConditionExpression = query => {
   let ConditionExpression         = []
   const ExpressionAttributeNames  = {}
   const ExpressionAttributeValues = {}
 
   for (let key in query) {
-    const isSortKey = key === sortKey
-
-    if (isSortKey) { continue }
-
     let path          = '#Q_' + key.replace(/\./g, '.#Q_')
     const valueKey    = key.replace(/\.|:/g, '_')
     const filterValue = query[key]
