@@ -4,12 +4,12 @@ const createError              = require('./createError')
 const buildUpdateExpression    = require('./buildUpdateExpression')
 const buildConditionExpression = require('./buildConditionExpression')
 
-const updateItem = async (client, TableName, Key, query, attributes) => {
+const updateItem = async (client, TableName, Key, conditionQuery, attributes) => {
   let parameters = {
     Key,
     TableName,
     ReturnValues: 'ALL_NEW',
-    ...buildConditionExpression(query)
+    ...buildConditionExpression(conditionQuery)
   }
 
   parameters = buildUpdateExpression(parameters, attributes)

@@ -19,19 +19,13 @@
   "author": "Alexander Kravets <alex@slatestudio.com>",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.700.0",
-    "lodash.clonedeep": "^4.5.0",
-    "lodash.find": "^4.6.0",
+    "aws-sdk": "^2.706.0",
     "lodash.get": "^4.4.2",
-    "lodash.identity": "^3.0.0",
-    "lodash.keyby": "^4.6.0",
-    "lodash.omit": "^4.5.0",
-    "lodash.pickby": "^4.6.0",
     "lodash.uniq": "^4.5.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^7.2.0",
+    "eslint": "^7.3.1",
     "mocha": "^7.1.2",
     "nyc": "^15.1.0",
     "ulid": "^2.3.0"

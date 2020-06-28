@@ -2,14 +2,13 @@
 
 const get            = require('lodash.get')
 const AWS            = require('aws-sdk')
-const omit           = require('lodash.omit')
 const getItem        = require('./helpers/getItem')
-const buildKey       = require('./helpers/buildKey')
 const listItems      = require('./helpers/listItems')
 const deleteItem     = require('./helpers/deleteItem')
 const createItem     = require('./helpers/createItem')
 const updateItem     = require('./helpers/updateItem')
 const { homedir }    = require('os')
+const createError    = require('./helpers/createError')
 const createTable    = require('./helpers/createTable')
 const { existsSync } = require('fs')
 
@@ -109,53 +108,31 @@ class Table {
   }
 
   createItem(attributes) {
-    this._verifyKey('Create', attributes)
+    this._getKey('Create', attributes)
 
     return createItem(this._client, this._tableName, this._primaryKey, attributes)
   }
 
   getItem(query, options = {}) {
-    const key = this._getKey('Get', query)
+    const { key, conditionQuery } = this._getKey('Get', query)
 
-    return getItem(this._client, this._tableName, key, query, options)
+    return getItem(this._client, this._tableName, key, conditionQuery, options)
   }
 
   deleteItem(query) {
-    const key = this._getKey('Delete', query)
-
-    // TODO: Verify requirement for omit function:
-    const { partitionKey } = this._primaryKey
-    query = omit(query, [ partitionKey ])
+    const { key } = this._getKey('Delete', query)
 
     return deleteItem(this._client, this._tableName, key, query)
   }
 
   updateItem(query, attributes) {
-    const key = this._getKey('Delete', query)
+    const { key } = this._getKey('Update', query)
 
-    // TODO: Verify requirement for omit function:
-    const { partitionKey } = this._primaryKey
-    query = omit(query, [ partitionKey ])
+    const { primaryKey, sortKey } = this._primaryKey
+    delete attributes[sortKey]
+    delete attributes[primaryKey]
 
     return updateItem(this._client, this._tableName, key, query, attributes)
-
-    // const { resourceName, partitionKey, idKey } = queryKey
-
-    // const shouldUpdatePartitionKey = !!attributes[partitionKey]
-    // const shouldUpdateId = !!attributes[idKey]
-
-    // if (shouldUpdatePartitionKey) {
-    //   const message = `Update of partition key "${partitionKey}" for` +
-    //     ` "${resourceName}" is restricted`
-
-    //   throw new InvalidAttributesError(message, { queryKey, query, attributes })
-    // }
-
-    // if (shouldUpdateId) {
-    //   throw new InvalidAttributesError(
-    //     `Update of ID key "${idKey}" for "${resourceName}" is restricted`,
-    //     { queryKey, query, attributes })
-    // }
   }
 
   listItems(query = {}, options = {}) {
@@ -185,14 +162,33 @@ class Table {
     return indexKey
   }
 
-  _getKey(methodName, attributes, indexName) {
+  _getKey(methodName, query, indexName) {
     const indexKey = this._getIndexKey(indexName)
 
-    return buildKey(methodName, indexKey, attributes)
-  }
+    const { partitionKey, sortKey } = indexKey
 
-  _verifyKey(...params) {
-    this._getKey(...params)
+    const {
+      [sortKey]:      sortKeyValue,
+      [partitionKey]: partitionKeyValue,
+      ...conditionQuery
+    } = query
+
+    const isMissingKey = !!partitionKeyValue && !!sortKeyValue
+
+    if (!isMissingKey) {
+      const message = `Item method "${methodName}" requires "${partitionKey}"` +
+        ` and "${sortKey}" to be defined in query`
+
+      throw createError(message, { indexKey, query })
+    }
+
+    return {
+      key: {
+        [sortKey]:      sortKeyValue,
+        [partitionKey]: partitionKeyValue
+      },
+      conditionQuery
+    }
   }
 }
 

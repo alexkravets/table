@@ -3,16 +3,17 @@
 const createError = require('./createError')
 const buildConditionExpression = require('./buildConditionExpression')
 
-const deleteItem = async (client, TableName, Key, query) => {
-  let {
+const deleteItem = async (client, TableName, Key, conditionQuery) => {
+  let parameters = { Key, TableName }
+
+  const {
     ExpressionAttributeNames,
     ExpressionAttributeValues,
     ConditionExpression
-  } = buildConditionExpression(query)
+  } = buildConditionExpression(conditionQuery)
 
-  const parameters = {
-    Key,
-    TableName,
+  parameters = {
+    ...parameters,
     ConditionExpression,
     ExpressionAttributeNames,
     ExpressionAttributeValues
