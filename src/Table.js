@@ -13,15 +13,19 @@ const { homedir }    = require('os')
 const createTable    = require('./helpers/createTable')
 const { existsSync } = require('fs')
 
+const ROOT_PATH = process.cwd()
+const { name }  = require(`${ROOT_PATH}/package.json`)
+const tablePrefix = name.replace('@', '').replace('/', '-')
+
 const HOME            = homedir()
 const LOCAL_REGION    = 'local'
 const LOCAL_ENDPOINT  = 'http://0.0.0.0:8000'
 const DEFAULT_PROFILE = 'private'
 
 const DEFAULT_INDEXES     = {}
-const DEFAULT_TABLE_NAME  = 'default'
+const DEFAULT_TABLE_NAME  = `${tablePrefix}-${process.env.NODE_ENV}`
 const DEFAULT_PRIMARY_KEY = {
-  partitionKey: 'resourceName',
+  partitionKey: 'partition',
   sortKey:      'id'
 }
 
@@ -107,10 +111,9 @@ class Table {
   }
 
   readItem(attributes, options = {}) {
-    const { index: indexName, ...otherOptions } = options
-    const key = this._getKey('Get', attributes, indexName)
+    const key = this._getKey('Get', attributes)
 
-    return getItem(this._client, this._tableName, key, attributes, otherOptions)
+    return getItem(this._client, this._tableName, key, attributes, options)
   }
 
   deleteItem(attributes) {
@@ -152,16 +155,21 @@ class Table {
   }
 
   listItems(query = {}, options = {}) {
-    const indexKey = this._getIndexKey(options.index)
+    const { index: indexName, ...otherOptions } = options
+    const indexKey = this._getIndexKey(indexName)
 
-    return listItems(this._client, this._tableName, indexKey, query, options)
+    return listItems(this._client, this._tableName, indexKey, query, { indexName, ...otherOptions })
   }
 
   // ---
 
   // TODO: This should auto-detect index based on attributes:
-  _getIndexKey(indexName = 'NONE') {
-    const indexKey = this._indexes[indexName] || this._primaryKey
+  _getIndexKey(indexName) {
+    let indexKey = this._primaryKey
+
+    if (indexName) {
+      indexKey = this._indexes[indexName]
+    }
 
     if (!indexKey) {
       throw new Error(`Index "${this._tableName}.${indexName}" is not defined`)

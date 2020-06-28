@@ -3,7 +3,7 @@
 const { Table } = require('src')
 const { expect, expectError } = require('./helpers')
 
-const resourceName = 'Profile'
+const partition = 'Profile'
 
 describe('table.deleteItem(attributes)', () => {
   let table
@@ -17,16 +17,16 @@ describe('table.deleteItem(attributes)', () => {
     const attributes = {
       name: 'Sonya',
       id,
-      resourceName
+      partition
     }
     await table.createItem(attributes)
   })
 
   it('returns "true" if item deleted', async () => {
-    const isDeleted = await table.deleteItem({ id, resourceName })
+    const isDeleted = await table.deleteItem({ id, partition })
     expect(isDeleted).to.be.true
 
-    const item = await table.readItem({ id, resourceName })
+    const item = await table.readItem({ id, partition })
     expect(item).to.not.exist
   })
 
@@ -34,14 +34,14 @@ describe('table.deleteItem(attributes)', () => {
   // TODO: Test deletion via index:
 
   it('returns "false" if item not found', async () => {
-    const isDeleted = await table.deleteItem({ id: 'NONE', resourceName })
+    const isDeleted = await table.deleteItem({ id: 'NONE', partition })
     expect(isDeleted).to.be.false
   })
 
-  it('throws "TableNotFoundError" if table not found', async () => {
+  it('throws error if table not found', async () => {
     await table.destroy()
 
-    const error = await expectError(() => table.deleteItem({ id, resourceName }))
-    expect(error).to.include({ code: 'TableNotFoundError' })
+    const error = await expectError(() => table.deleteItem({ id, partition }))
+    expect(error.message).to.include('Table "kravc-table-test" does not exist')
   })
 })

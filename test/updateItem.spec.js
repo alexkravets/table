@@ -3,7 +3,7 @@
 const { Table } = require('src')
 const { expect, expectError } = require('./helpers')
 
-const resourceName = 'Profile'
+const partition = 'Profile'
 
 describe('table.updateItem(query, attributes)', () => {
   let table
@@ -22,13 +22,13 @@ describe('table.updateItem(query, attributes)', () => {
         status: 'Happy'
       },
       id,
-      resourceName
+      partition
     }
     await table.createItem(attributes)
   })
 
   it('returns updated item', async () => {
-    const item = await table.updateItem({ id, resourceName }, {
+    const item = await table.updateItem({ id, partition }, {
       name:                'Jenny',
       'pets.status':       'Neutral',
       'pets.cats:append':  'Tony',
@@ -42,8 +42,8 @@ describe('table.updateItem(query, attributes)', () => {
     expect(item.pets.cats[2]).to.eql('Tony')
   })
 
-  it('supports updated item list element by index', async () => {
-    const item = await table.updateItem({ id, resourceName }, {
+  it('updates item list element by index', async () => {
+    const item = await table.updateItem({ id, partition }, {
       'pets.dogs[0]': 'Bob'
     })
 
@@ -52,14 +52,14 @@ describe('table.updateItem(query, attributes)', () => {
   })
 
   it('returns "false" if item not found', async () => {
-    const isUpdate = await table.updateItem({ id: 'NONE', resourceName }, { name: 'Jenny' })
+    const isUpdate = await table.updateItem({ id: 'NONE', partition }, { name: 'Jenny' })
     expect(isUpdate).to.be.false
   })
 
-  it('throws "TableNotFoundError" if table not found', async () => {
+  it('throws error if table not found', async () => {
     await table.destroy()
 
-    const error = await expectError(() => table.updateItem({ id, resourceName }, { name: 'Jenny' }))
-    expect(error).to.include({ code: 'TableNotFoundError' })
+    const error = await expectError(() => table.updateItem({ id, partition }, { name: 'Jenny' }))
+    expect(error.message).to.include('Table "kravc-table-test" does not exist')
   })
 })

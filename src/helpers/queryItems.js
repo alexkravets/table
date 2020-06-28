@@ -1,6 +1,6 @@
 'use strict'
 
-const TableNotFoundError = require('../errors/TableNotFoundError')
+const createError = require('./createError')
 
 const queryItems = async (client, tableName, parameters) => {
   let result
@@ -11,7 +11,7 @@ const queryItems = async (client, tableName, parameters) => {
   } catch (dynamoError) {
     /* istanbul ignore else */
     if (dynamoError.name === 'ResourceNotFoundException') {
-      throw new TableNotFoundError(tableName)
+      throw createError(`Table "${tableName}" does not exist`)
     }
 
     /* istanbul ignore next */

@@ -1,0 +1,11 @@
+version: '2.1'
+networks:
+  main:
+services:
+  dynamo:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamo
+    ports:
+      - "8000:8000"
+    networks:
+      main:

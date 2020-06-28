@@ -1,6 +1,6 @@
 'use strict'
 
-const TableNotFoundError = require('../errors/TableNotFoundError')
+const createError = require('./createError')
 const buildProjectionExpression = require('./buildProjectionExpression')
 
 const getItem = async (client, TableName, Key, attributes, options) => {
@@ -31,7 +31,7 @@ const getItem = async (client, TableName, Key, attributes, options) => {
   } catch (dynamoError) {
     /* istanbul ignore else */
     if (dynamoError.name === 'ResourceNotFoundException') {
-      throw new TableNotFoundError(TableName)
+      throw createError(`Table "${TableName}" does not exist`)
     }
 
     /* istanbul ignore next */

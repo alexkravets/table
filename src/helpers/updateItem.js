@@ -1,6 +1,6 @@
 'use strict'
 
-const TableNotFoundError       = require('../errors/TableNotFoundError')
+const createError              = require('./createError')
 const buildUpdateExpression    = require('./buildUpdateExpression')
 const buildConditionExpression = require('./buildConditionExpression')
 
@@ -26,7 +26,7 @@ const updateItem = async (client, TableName, Key, query, attributes) => {
 
     /* istanbul ignore else: No need to simulate unexpected Dynamo errors */
     if (dynamoError.code === 'ResourceNotFoundException') {
-      throw new TableNotFoundError(TableName)
+      throw createError(`Table "${TableName}" does not exist`)
     }
 
     /* istanbul ignore next */

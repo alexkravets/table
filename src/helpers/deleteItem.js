@@ -1,14 +1,14 @@
 'use strict'
 
-const TableNotFoundError = require('../errors/TableNotFoundError')
+const createError = require('./createError')
 const buildConditionExpression = require('./buildConditionExpression')
 
-const deleteItem = async (client, TableName, Key, attributes) => {
+const deleteItem = async (client, TableName, Key, query) => {
   let {
     ExpressionAttributeNames,
     ExpressionAttributeValues,
     ConditionExpression
-  } = buildConditionExpression(attributes)
+  } = buildConditionExpression(query)
 
   const parameters = {
     Key,
@@ -28,7 +28,7 @@ const deleteItem = async (client, TableName, Key, attributes) => {
 
     /* istanbul ignore else */
     if (dynamoError.code === 'ResourceNotFoundException') {
-      throw new TableNotFoundError(TableName)
+      throw createError(`Table "${TableName}" does not exist`)
     }
 
     /* istanbul ignore next */

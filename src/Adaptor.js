@@ -6,24 +6,13 @@ const Table = require('./Table')
 // const ResourceExistsError = require('./errors/ResourceExistsError')
 // const ResourceNotFoundError = require('../errors/ResourceNotFoundError')
 
-const Dynamo = (config, Document) => {
+const Adaptor = (Document, config) => {
   const table = new Table(config)
 
   return class extends Document {
-    // static get resourceId() {
-    //   return this.resourceName
-    // }
-
-    // static documentId(attributes = {}) {
-    //   if (attributes[this.idKey]) {
-    //     return attributes[this.idKey]
-    //   }
-
-    //   const id = ulid()
-    //   const { resourceId } = this
-
-    //   return `${resourceId}_${id}`
-    // }
+    static get partitionKey() {
+      return this.name
+    }
 
     static async _create(attributes) {
       // attributes = cloneDeep(attributes)
@@ -58,4 +47,4 @@ const Dynamo = (config, Document) => {
   }
 }
 
-module.exports = Dynamo
+module.exports = Adaptor

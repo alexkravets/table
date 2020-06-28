@@ -1,8 +1,8 @@
 'use strict'
 
-const queryItems           = require('./queryItems')
-const queryString          = require('querystring')
-const InvalidQueryError    = require('../errors/InvalidQueryError')
+const queryItems  = require('./queryItems')
+const queryString = require('querystring')
+const createError = require('./createError')
 const buildQueryParameters = require('./buildQueryParameters')
 
 const listItems = async (client, tableName, indexKey, query, options) => {
@@ -13,7 +13,7 @@ const listItems = async (client, tableName, indexKey, query, options) => {
     const message = `Item method "Query" requires "${partitionKey}"` +
       ' attribute to be provided'
 
-    throw new InvalidQueryError(message, { query, options })
+    throw createError(message, { query, options })
   }
 
   const parameters = buildQueryParameters(tableName, indexKey, query, options)

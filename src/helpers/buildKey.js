@@ -1,6 +1,6 @@
 'use strict'
 
-const InvalidItemKeyError = require('../errors/InvalidItemKeyError')
+const createError = require('./createError')
 
 const buildKey = (methodName, indexKey, attributes) => {
   const { partitionKey, sortKey } = indexKey
@@ -14,7 +14,7 @@ const buildKey = (methodName, indexKey, attributes) => {
     const message = `Item method "${methodName}" requires "${partitionKey}"` +
       ` and "${sortKey}" attributes to be provided`
 
-    throw new InvalidItemKeyError(message, { indexKey, attributes })
+    throw createError(message, { indexKey, attributes })
   }
 
   return {

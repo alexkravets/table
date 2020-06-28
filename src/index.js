@@ -1,9 +1,9 @@
 'use strict'
 
-const Table  = require('./Table')
-// const Dynamo = require('./Dynamo')
+const Table = require('./Table')
+// const Adaptor = require('./Adaptor')
 
 module.exports = {
   Table,
-  // Dynamo
+  // Adaptor
 }
