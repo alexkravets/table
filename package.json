@@ -1,6 +1,6 @@
 {
   "name": "@kravc/table",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Simple CRUD and query interface for DynamoDB table",
   "main": "index.js",
   "repository": {
@@ -11,7 +11,7 @@
     "src": "src"
   },
   "scripts": {
-    "test": "eslint bin/ src/ test/ && NODE_ENV=test NODE_PATH=./ nyc mocha"
+    "test": "eslint bin/ src/ test/ && NODE_APP_INSTANCE=test NODE_PATH=./ nyc mocha"
   },
   "bin": {
     "table": "bin/table.js"

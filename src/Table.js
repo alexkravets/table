@@ -12,17 +12,19 @@ const createError    = require('./helpers/createError')
 const createTable    = require('./helpers/createTable')
 const { existsSync } = require('fs')
 
-const ROOT_PATH = process.cwd()
-const { name }  = require(`${ROOT_PATH}/package.json`)
-const tablePrefix = name.replace('@', '').replace('/', '-')
+const ROOT_PATH    = process.cwd()
+const { name }     = require(`${ROOT_PATH}/package.json`)
+const TABLE_PREFIX = name.replace('@', '').replace('/', '-')
 
 const HOME            = homedir()
+const INSTANCE        = process.env.NODE_APP_INSTANCE
 const LOCAL_REGION    = 'local'
 const LOCAL_ENDPOINT  = 'http://0.0.0.0:8000'
 const DEFAULT_PROFILE = 'private'
 
 const DEFAULT_INDEXES     = {}
-const DEFAULT_TABLE_NAME  = `${tablePrefix}-${process.env.NODE_ENV}`
+/* istanbul ignore next */
+const DEFAULT_TABLE_NAME  = INSTANCE ? `${TABLE_PREFIX}-${INSTANCE}` : TABLE_PREFIX
 const DEFAULT_PRIMARY_KEY = {
   partitionKey: 'partition',
   sortKey:      'id'
@@ -77,6 +79,10 @@ class Table {
     return this._primaryKey
   }
 
+  get name() {
+    return this._tableName
+  }
+
   create() {
     return createTable(
       this._rawClient,
@@ -92,9 +98,13 @@ class Table {
     return this._rawClient.deleteTable({ TableName }).promise()
   }
 
+  delete() {
+    return this.destroy()
+  }
+
   async reset() {
     try {
-      await this.destroy()
+      await this.delete()
 
     } catch (error) {
       /* istanbul ignore next */
