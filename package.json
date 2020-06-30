@@ -1,6 +1,6 @@
 {
   "name": "@kravc/table",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Simple CRUD and query interface for DynamoDB table",
   "main": "src/index.js",
   "repository": {
