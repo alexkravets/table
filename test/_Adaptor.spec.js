@@ -55,8 +55,13 @@ describe('Adaptor = (Document, config)', () => {
   })
 
   describe('._read(query, options = {})', () => {
-    it('returns item', async () => {
+    it('returns item for ID request', async () => {
       const item = await Klass._read({ id })
+      expect(item).to.exist
+    })
+
+    it('returns item for query request', async () => {
+      const item = await Klass._read({ id, name: 'Hello, world!' })
       expect(item).to.exist
     })
   })

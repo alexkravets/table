@@ -39,8 +39,19 @@ const Adaptor = (Document, config) => {
       return table.listItems(query, options)
     }
 
-    static _read(query, options = {}) {
-      query = this._getPartitionQuery(query, options.index)
+    static async _read(query, options = {}) {
+      const { [this.idKey]: idValue, ...other } = query
+
+      const hasIndex = !!options.index
+      const hasOther = Object.keys(other).length > 0
+      const isQuery  = hasIndex || hasOther
+
+      if (isQuery) {
+        const { items } = await this._index(query, { ...options, limit: 1 })
+        return items[0]
+      }
+
+      query = this._getPartitionQuery({ [this.idKey]: idValue }, options.index)
 
       return table.getItem(query, options)
     }

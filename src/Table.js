@@ -124,9 +124,9 @@ class Table {
   }
 
   getItem(query, options = {}) {
-    const { key, conditionQuery } = this._getKey('Get', query)
+    const { key } = this._getKey('Get', query)
 
-    return getItem(this._client, this._tableName, key, conditionQuery, options)
+    return getItem(this._client, this._tableName, key, options)
   }
 
   deleteItem(query) {

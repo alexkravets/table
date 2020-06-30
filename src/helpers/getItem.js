@@ -3,7 +3,7 @@
 const createError = require('./createError')
 const buildProjectionExpression = require('./buildProjectionExpression')
 
-const getItem = async (client, TableName, Key, conditionQuery, options) => {
+const getItem = async (client, TableName, Key, options) => {
   const parameters = {
     Key,
     TableName

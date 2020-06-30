@@ -95,6 +95,16 @@ describe('table.listItems(query = {}, options = {})', () => {
     expect(result.items[0].name).to.eql('Name-20')
   })
 
+  it('supports :bw filter for sort key', async () => {
+    let result
+
+    result = await table.listItems({ partition })
+    const [ item ] = result.items
+
+    result = await table.listItems({ partition, 'id:bw': item.id[0] })
+    expect(result.items).to.be.not.empty
+  })
+
   it('supports :gt filter', async () => {
     const result = await table.listItems({ partition, 'age:gt': 5 })
     expect(result.items[0].age).to.eql(6)
