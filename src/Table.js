@@ -165,11 +165,11 @@ class Table {
 
     const isSecondaryLocalIndex = !indexKey.partitionKey
 
-    if (isSecondaryLocalIndex) {
-      indexKey.partitionKey = this._primaryKey.partitionKey
+    if (!isSecondaryLocalIndex) {
+      return { ...indexKey }
     }
 
-    return indexKey
+    return { ...indexKey, partitionKey: this._primaryKey.partitionKey }
   }
 
   _getKey(methodName, query, indexName) {
