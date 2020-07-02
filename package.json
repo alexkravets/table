@@ -1,6 +1,6 @@
 {
   "name": "@kravc/table",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "Simple CRUD and query interface for DynamoDB table",
   "main": "src/index.js",
   "repository": {
@@ -19,7 +19,7 @@
   "author": "Alexander Kravets <alex@slatestudio.com>",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.706.0",
+    "aws-sdk": "^2.709.0",
     "lodash.get": "^4.4.2",
     "lodash.uniq": "^4.5.0"
   },

@@ -9,19 +9,20 @@ const config = require('config')
 const TABLES = config.get('tables', {})
 
 const _getTableOptions = tableId => {
-  const config  = TABLES[tableId]
+  const tableOptions = JSON.parse(JSON.stringify(TABLES[tableId]))
+
   const region  = get(config, 'aws.region')
   const profile = get(config, 'aws.profile')
 
   if (region) {
-    config.region = region
+    tableOptions.region = region
   }
 
   if (profile) {
-    config.profile = profile
+    tableOptions.profile = profile
   }
 
-  return config
+  return tableOptions
 }
 
 const _action = async (methodName) => {
