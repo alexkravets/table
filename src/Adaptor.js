@@ -1,9 +1,11 @@
 'use strict'
 
 const Table = require('./Table')
+const getTableOptions = require('./helpers/getTableOptions')
 
-const Adaptor = (Document, config) => {
-  const table = new Table(config)
+const Adaptor = (Document, config, tableId) => {
+  const options = getTableOptions(config, tableId)
+  const table = new Table(options)
 
   const {
     sortKey:      ID_KEY,

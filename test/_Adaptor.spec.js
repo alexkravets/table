@@ -3,18 +3,22 @@
 const { expect }  = require('./helpers')
 const { Adaptor } = require('src')
 
-describe('Adaptor = (Document, config)', () => {
+describe('Adaptor = (Document, config, tableId)', () => {
   let Klass
 
   before(async () => {
     class Profile {}
     Klass = Adaptor(Profile, {
-      indexes: {
-        nameIndex: {
-          sortKey: 'name'
+      tables: {
+        default: {
+          indexes: {
+            nameIndex: {
+              sortKey: 'name'
+            }
+          }
         }
       }
-    })
+    }, 'default')
 
     await Klass.table.reset()
   })

@@ -2,32 +2,15 @@
 
 'use strict'
 
-const get    = require('lodash.get')
 const Table  = require('../src/Table')
 const config = require('config')
+const getTableOptions = require('../src/helpers/getTableOptions')
 
-const TABLES = config.get('tables', {})
-
-const _getTableOptions = tableId => {
-  const tableOptions = JSON.parse(JSON.stringify(TABLES[tableId]))
-
-  const region  = get(config, 'aws.region')
-  const profile = get(config, 'aws.profile')
-
-  if (region) {
-    tableOptions.region = region
-  }
-
-  if (profile) {
-    tableOptions.profile = profile
-  }
-
-  return tableOptions
-}
+const tables = config.get('tables', {})
 
 const _action = async (methodName) => {
-  for (const tableId in TABLES) {
-    const config = _getTableOptions(tableId)
+  for (const tableId in tables) {
+    const config = getTableOptions(config, tableId)
 
     const table = new Table(config)
     const { name: tableName } = table
