@@ -10,9 +10,9 @@ const tables = config.get('tables', {})
 
 const _action = async (methodName) => {
   for (const tableId in tables) {
-    const config = getTableOptions(config, tableId)
+    const options = getTableOptions(config, tableId)
 
-    const table = new Table(config)
+    const table = new Table(options)
     const { name: tableName } = table
 
     try {
