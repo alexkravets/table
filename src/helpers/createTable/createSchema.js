@@ -13,17 +13,20 @@ const createSchema = (TableName, primaryKey, indexes, options) => {
 
   const AttributeDefinitions = getAttributeDefinitions(partitionKey, sortKey, indexes)
 
+  const { BillingMode, ...otherOptions } = options
+
   const schema = {
     TableName,
     KeySchema,
+    BillingMode,
     AttributeDefinitions,
-    ...options
+    ...otherOptions
   }
 
   const {
     LocalSecondaryIndexes,
     GlobalSecondaryIndexes
-  } = getSecondaryIndexes(partitionKey, indexes, options)
+  } = getSecondaryIndexes(partitionKey, indexes, otherOptions)
 
   /* istanbul ignore else */
   if (LocalSecondaryIndexes) {
