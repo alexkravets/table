@@ -2,8 +2,9 @@
 
 'use strict'
 
-const Table  = require('../src/Table')
-const config = require('config')
+const Table    = require('../src/Table')
+const config   = require('config')
+const { exec } = require('child_process')
 const getTableOptions = require('../src/helpers/getTableOptions')
 
 const tables = config.get('tables', {})
@@ -49,9 +50,8 @@ const command = process.argv[2]
 const isInvalidCommand = ![ 'up', 'create', 'delete', 'reset' ].includes(command)
 
 if (isInvalidCommand) {
-  console.info('table [up|create|delete|reset]\n')
+  console.info('table [create|delete|reset] [ENV=dev|stg|prd]\n')
   console.info('Commands:')
-  console.info('  up         Ensure Docker and DynamoDB container are up')
   console.info('  create     Create tables defined in configuration')
   console.info('  delete     Delete tables defined in "/config/default.yaml"')
   console.info('  reset      Reset tables defined in "/config/default.yaml"')
@@ -60,4 +60,17 @@ if (isInvalidCommand) {
   process.exit(1)
 }
 
-COMMANDS[command]()
+const env = process.argv[3]
+
+if (env) {
+  process.env.NODE_ENV = 'serverless'
+  process.env.NODE_APP_INSTANCE = env
+}
+
+const run = async callback => {
+  const command = exec('docker-compose up -d', callback)
+  command.stdout.on('data', data => console.log(data))
+  command.stderr.on('data', data => console.error(data))
+}
+
+run(() => COMMANDS[command]())
