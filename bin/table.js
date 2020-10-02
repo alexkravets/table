@@ -68,7 +68,7 @@ if (env) {
 }
 
 const run = async callback => {
-  const command = exec('docker-compose up -d', callback)
+  const command = exec('docker-compose -f node_modules/@kravc/table/docker-compose.yaml up -d', callback)
   command.stdout.on('data', data => console.log(data))
   command.stderr.on('data', data => console.error(data))
 }
