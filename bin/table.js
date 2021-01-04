@@ -2,12 +2,13 @@
 
 'use strict'
 
+const get      = require('lodash.get')
 const Table    = require('../src/Table')
 const config   = require('config')
 const { exec } = require('child_process')
 const getTableOptions = require('../src/helpers/getTableOptions')
 
-const tables = config.get('tables', {})
+const tables = get(config, 'tables', { default: {} })
 
 const _action = async (methodName) => {
   for (const tableId in tables) {

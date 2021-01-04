@@ -3,6 +3,8 @@
 const Table = require('./Table')
 const getTableOptions = require('./helpers/getTableOptions')
 
+const UNDEFINED_PARTITION = 'UNDEFINED'
+
 const Adaptor = (Document, config, tableId) => {
   const options = getTableOptions(config, tableId)
   const table = new Table(options)
@@ -22,7 +24,7 @@ const Adaptor = (Document, config, tableId) => {
     }
 
     static get partition() {
-      return this.name
+      return this.name || UNDEFINED_PARTITION
     }
 
     static _create(attributes) {
