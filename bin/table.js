@@ -2,6 +2,27 @@
 
 'use strict'
 
+const command = process.argv[2]
+const isInvalidCommand = ![ 'up', 'create', 'delete', 'reset' ].includes(command)
+
+if (isInvalidCommand) {
+  console.info('table [create|delete|reset] [ENV=dev|stg|prd]\n')
+  console.info('Commands:')
+  console.info('  create     Create tables defined in configuration')
+  console.info('  delete     Delete tables defined in "/config/default.yaml"')
+  console.info('  reset      Reset tables defined in "/config/default.yaml"')
+  console.info('\nDefault configuration file: "/config/default.yaml".')
+
+  process.exit(1)
+}
+
+const env = process.argv[3]
+
+if (env) {
+  process.env.NODE_ENV = 'serverless'
+  process.env.NODE_APP_INSTANCE = env
+}
+
 const get      = require('lodash.get')
 const Table    = require('../src/Table')
 const config   = require('config')
@@ -45,33 +66,16 @@ const _reset = async () => {
   await _create()
 }
 
-const COMMANDS = { create: _create, delete: _delete, reset: _reset }
-
-const command = process.argv[2]
-const isInvalidCommand = ![ 'up', 'create', 'delete', 'reset' ].includes(command)
-
-if (isInvalidCommand) {
-  console.info('table [create|delete|reset] [ENV=dev|stg|prd]\n')
-  console.info('Commands:')
-  console.info('  create     Create tables defined in configuration')
-  console.info('  delete     Delete tables defined in "/config/default.yaml"')
-  console.info('  reset      Reset tables defined in "/config/default.yaml"')
-  console.info('\nDefault configuration file: "/config/default.yaml".')
-
-  process.exit(1)
-}
-
-const env = process.argv[3]
-
-if (env) {
-  process.env.NODE_ENV = 'serverless'
-  process.env.NODE_APP_INSTANCE = env
-}
-
 const run = async callback => {
+  if (env) {
+    return callback()
+  }
+
   const command = exec('docker-compose -f node_modules/@kravc/table/docker-compose.yaml up -d', callback)
   command.stdout.on('data', data => console.log(data))
   command.stderr.on('data', data => console.error(data))
 }
+
+const COMMANDS = { create: _create, delete: _delete, reset: _reset }
 
 run(() => COMMANDS[command]())
