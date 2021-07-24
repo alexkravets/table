@@ -16,6 +16,7 @@ describe('table.updateItem(query, attributes)', () => {
 
     const attributes = {
       name: 'Olya',
+      size: 'XL',
       pets: {
         cats: [ 'Bonya', 'Zoe' ],
         dogs: [ 'Jessy' ],
@@ -40,6 +41,15 @@ describe('table.updateItem(query, attributes)', () => {
     expect(item.pets.status).to.eql('Neutral')
     expect(item.pets.dogs[0]).to.eql('Stark')
     expect(item.pets.cats[2]).to.eql('Tony')
+  })
+
+  it('removes items attribute', async () => {
+    const item = await table.updateItem({ id, partition }, {
+      size: null
+    })
+
+    expect(item).to.be.exist
+    expect(item.size).to.not.exist
   })
 
   it('updates item list element by index', async () => {
