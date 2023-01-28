@@ -1,9 +1,9 @@
 'use strict'
 
 const Table   = require('./Table')
-const Adaptor = require('./Adaptor')
+const Adapter = require('./Adapter')
 
 module.exports = {
   Table,
-  Adaptor
+  Adapter
 }

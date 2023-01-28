@@ -5,7 +5,7 @@ const getTableOptions = require('./helpers/getTableOptions')
 
 const UNDEFINED_PARTITION = 'UNDEFINED'
 
-const Adaptor = (Document, config, tableId) => {
+const Adapter = (Document, config, tableId) => {
   const options = getTableOptions(config, tableId)
   const table = new Table(options)
 
@@ -15,6 +15,10 @@ const Adaptor = (Document, config, tableId) => {
   } = table.primaryKey
 
   return class extends Document {
+    static get INDEX_LIMIT_MAX() {
+      return 999
+    }
+
     static get table() {
       return table
     }
@@ -92,4 +96,4 @@ const Adaptor = (Document, config, tableId) => {
   }
 }
 
-module.exports = Adaptor
+module.exports = Adapter

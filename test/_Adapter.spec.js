@@ -1,14 +1,14 @@
 'use strict'
 
 const { expect }  = require('./helpers')
-const { Adaptor } = require('src')
+const { Adapter } = require('src')
 
-describe('Adaptor = (Document, config, tableId)', () => {
+describe('Adapter = (Document, config, tableId)', () => {
   let Klass
 
   before(async () => {
     class Profile {}
-    Klass = Adaptor(Profile, {
+    Klass = Adapter(Profile, {
       tables: {
         default: {
           indexes: {
@@ -53,7 +53,7 @@ describe('Adaptor = (Document, config, tableId)', () => {
       items = await Klass._index({ partition: 'Profile' })
       expect(items).to.exist
 
-      items = await Klass._index({ partition: 'Profile' }, { index: 'nameIndex' })
+      items = await Klass._index({ partition: 'Profile' }, { index: 'nameIndex', limit: Klass.INDEX_LIMIT_MAX })
       expect(items).to.exist
     })
   })
