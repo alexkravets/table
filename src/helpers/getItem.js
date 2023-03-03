@@ -26,7 +26,7 @@ const getItem = async (client, TableName, Key, options) => {
   let result
 
   try {
-    result = await client.get(parameters).promise()
+    result = await client.get(parameters)
 
   } catch (dynamoError) {
     /* istanbul ignore else */
