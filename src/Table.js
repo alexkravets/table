@@ -1,18 +1,20 @@
 'use strict'
 
-const get                                  = require('lodash.get')
-const {DynamoDBClient, DeleteTableCommand} = require('@aws-sdk/client-dynamodb')
-const {DynamoDBDocument}                   = require('@aws-sdk/lib-dynamodb')
-const {fromIni}                            = require('@aws-sdk/credential-providers')
-const getItem                              = require('./helpers/getItem')
-const listItems                            = require('./helpers/listItems')
-const deleteItem                           = require('./helpers/deleteItem')
-const createItem                           = require('./helpers/createItem')
-const updateItem                           = require('./helpers/updateItem')
-const { homedir }                          = require('os')
-const createError                          = require('./helpers/createError')
-const createTable                          = require('./helpers/createTable')
-const { existsSync }                       = require('fs')
+const get                    = require('lodash.get')
+const { homedir }            = require('os')
+const { fromIni }            = require('@aws-sdk/credential-providers')
+const { existsSync }         = require('fs')
+const { DynamoDBClient }     = require('@aws-sdk/client-dynamodb')
+const { DynamoDBDocument }   = require('@aws-sdk/lib-dynamodb')
+const { DeleteTableCommand } = require('@aws-sdk/client-dynamodb')
+
+const getItem     = require('./helpers/getItem')
+const listItems   = require('./helpers/listItems')
+const deleteItem  = require('./helpers/deleteItem')
+const createItem  = require('./helpers/createItem')
+const updateItem  = require('./helpers/updateItem')
+const createError = require('./helpers/createError')
+const createTable = require('./helpers/createTable')
 
 const ROOT_PATH    = process.cwd()
 const { name }     = require(`${ROOT_PATH}/package.json`)
@@ -97,7 +99,7 @@ class Table {
 
   destroy() {
     const TableName = this._tableName
-    const command = new DeleteTableCommand({TableName})
+    const command = new DeleteTableCommand({ TableName })
     return this._client.send(command)
   }
 
@@ -113,8 +115,8 @@ class Table {
       /* istanbul ignore next */
       if (error.name !== 'ResourceNotFoundException') {
         throw error
-
       }
+
     }
 
     await this.create()
