@@ -17,15 +17,15 @@ const updateItem = async (client, TableName, Key, conditionQuery, attributes) =>
   let result
 
   try {
-    result = await client.update(parameters).promise()
+    result = await client.update(parameters)
 
   } catch (dynamoError) {
-    if (dynamoError.code === 'ConditionalCheckFailedException') {
+    if (dynamoError.name === 'ConditionalCheckFailedException') {
       return false
     }
 
     /* istanbul ignore else: No need to simulate unexpected Dynamo errors */
-    if (dynamoError.code === 'ResourceNotFoundException') {
+    if (dynamoError.name === 'ResourceNotFoundException') {
       throw createError(`Table "${TableName}" does not exist`)
     }
 

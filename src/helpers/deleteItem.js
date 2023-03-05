@@ -20,15 +20,15 @@ const deleteItem = async (client, TableName, Key, conditionQuery) => {
   }
 
   try {
-    await client.delete(parameters).promise()
+    await client.delete(parameters)
 
   } catch (dynamoError) {
-    if (dynamoError.code === 'ConditionalCheckFailedException') {
+    if (dynamoError.name === 'ConditionalCheckFailedException') {
       return false
     }
 
     /* istanbul ignore else */
-    if (dynamoError.code === 'ResourceNotFoundException') {
+    if (dynamoError.name === 'ResourceNotFoundException') {
       throw createError(`Table "${TableName}" does not exist`)
     }
 

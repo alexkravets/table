@@ -17,15 +17,15 @@ const createItem = async (client, TableName, primaryKey, attributes) => {
   putParameters.ExpressionAttributeValues[`:${idKey}`] = attributes[idKey]
 
   try {
-    await client.put(putParameters).promise()
+    await client.put(putParameters)
 
   } catch (dynamoError) {
-    if (dynamoError.code === 'ConditionalCheckFailedException') {
+    if (dynamoError.name === 'ConditionalCheckFailedException') {
       return false
     }
 
     /* istanbul ignore else */
-    if (dynamoError.code === 'ResourceNotFoundException') {
+    if (dynamoError.name === 'ResourceNotFoundException') {
       throw createError(`Table "${TableName}" does not exist`)
     }
 

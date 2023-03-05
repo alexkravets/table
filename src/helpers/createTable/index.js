@@ -1,11 +1,12 @@
 'use strict'
 
 const createSchema = require('./createSchema')
+const {CreateTableCommand} = require('@aws-sdk/client-dynamodb')
 
-const createTable = (rawClient, tableName, primaryKey, indexes, options) => {
+const createTable = (client, tableName, primaryKey, indexes, options) => {
   const schema = createSchema(tableName, primaryKey, indexes, options)
-
-  return rawClient.createTable(schema).promise()
+  const command = new CreateTableCommand(schema)
+  return client.send(command)
 }
 
 module.exports = createTable

@@ -22,11 +22,10 @@
     "lodash.get": "^4.4.2",
     "lodash.uniq": "^4.5.0"
   },
-  "peerDependencies": {
-    "aws-sdk": "^2.700.0"
-  },
   "devDependencies": {
-    "aws-sdk": "^2.765.0",
+    "@aws-sdk/client-dynamodb": "^3.284.0",
+    "@aws-sdk/credential-providers": "^3.282.0",
+    "@aws-sdk/lib-dynamodb": "^3.284.0",
     "chai": "^4.2.0",
     "eslint": "^7.10.0",
     "mocha": "^10.2.0",

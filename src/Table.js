@@ -1,16 +1,18 @@
 'use strict'
 
-const get            = require('lodash.get')
-const AWS            = require('aws-sdk')
-const getItem        = require('./helpers/getItem')
-const listItems      = require('./helpers/listItems')
-const deleteItem     = require('./helpers/deleteItem')
-const createItem     = require('./helpers/createItem')
-const updateItem     = require('./helpers/updateItem')
-const { homedir }    = require('os')
-const createError    = require('./helpers/createError')
-const createTable    = require('./helpers/createTable')
-const { existsSync } = require('fs')
+const get                                  = require('lodash.get')
+const {DynamoDBClient, DeleteTableCommand} = require('@aws-sdk/client-dynamodb')
+const {DynamoDBDocument}                   = require('@aws-sdk/lib-dynamodb')
+const {fromIni}                            = require('@aws-sdk/credential-providers')
+const getItem                              = require('./helpers/getItem')
+const listItems                            = require('./helpers/listItems')
+const deleteItem                           = require('./helpers/deleteItem')
+const createItem                           = require('./helpers/createItem')
+const updateItem                           = require('./helpers/updateItem')
+const { homedir }                          = require('os')
+const createError                          = require('./helpers/createError')
+const createTable                          = require('./helpers/createTable')
+const { existsSync }                       = require('fs')
 
 const ROOT_PATH    = process.cwd()
 const { name }     = require(`${ROOT_PATH}/package.json`)
@@ -59,15 +61,15 @@ class Table {
     /* istanbul ignore else */
     if (hasAwsCredentials) {
       const profile = get(options, 'profile', DEFAULT_PROFILE)
-      config.credentials = new AWS.SharedIniFileCredentials({ profile })
+      config.credentials = fromIni({ profile })
     }
 
     const indexes    = get(options, 'indexes', DEFAULT_INDEXES)
     const tableName  = get(options, 'tableName', DEFAULT_TABLE_NAME)
     const primaryKey = get(options, 'primaryKey', DEFAULT_PRIMARY_KEY)
 
-    this._client    = new AWS.DynamoDB.DocumentClient(config)
-    this._rawClient = new AWS.DynamoDB(config)
+    this._rawClient = new DynamoDBClient(config)
+    this._client    = DynamoDBDocument.from(this._rawClient)
 
     this._indexes      = indexes
     this._tableName    = tableName
@@ -95,7 +97,8 @@ class Table {
 
   destroy() {
     const TableName = this._tableName
-    return this._rawClient.deleteTable({ TableName }).promise()
+    const command = new DeleteTableCommand({TableName})
+    return this._client.send(command)
   }
 
   delete() {
@@ -108,7 +111,7 @@ class Table {
 
     } catch (error) {
       /* istanbul ignore next */
-      if (error.code !== 'ResourceNotFoundException') {
+      if (error.name !== 'ResourceNotFoundException') {
         throw error
 
       }

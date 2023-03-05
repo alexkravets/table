@@ -6,7 +6,7 @@ const queryItems = async (client, tableName, parameters) => {
   let result
 
   try {
-    result = await client.query(parameters).promise()
+    result = await client.query(parameters)
 
   } catch (dynamoError) {
     /* istanbul ignore else */
