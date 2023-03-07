@@ -43,10 +43,10 @@ const _action = async (methodName) => {
       console.info(`Table "${tableName}" ${methodName}d`)
 
     } catch (error) {
-      if (error.code === 'ResourceInUseException') {
+      if (error.name === 'ResourceInUseException') {
         console.info(`Table "${tableName}" skipped`)
 
-      } else if (error.code === 'ResourceNotFoundException') {
+      } else if (error.name === 'ResourceNotFoundException') {
         console.info(`Table "${tableName}" not found`)
 
       } else {
