@@ -15,6 +15,7 @@ const buildConditionExpression = query => {
     const isContains    = key.endsWith(':contains')
     const isLessThan    = key.endsWith(':lt')
     const isGreaterThan = key.endsWith(':gt')
+    const isNotContains = key.endsWith(':not_contains')
 
     if (isNot) {
       key = key.replace(/:not/g, '')
@@ -22,6 +23,10 @@ const buildConditionExpression = query => {
 
     if (isContains) {
       key = key.replace(/:contains/g, '')
+    }
+
+    if (isNotContains) {
+      key = key.replace(/:not_contains/g, '')
     }
 
     if (isLessThan) {
@@ -61,6 +66,10 @@ const buildConditionExpression = query => {
       } else if (isContains) {
         path = path.replace(/:contains/, '')
         ConditionExpression.push(`contains(${path}, :Q_${valueKey})`)
+
+      } else if (isNotContains) {
+        path = path.replace(/:not_contains/, '')
+        ConditionExpression.push(`not contains(${path}, :Q_${valueKey})`)
 
       } else if (isLessThan) {
         path = path.replace(/:lt/, '')

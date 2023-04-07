@@ -125,6 +125,15 @@ describe('table.listItems(query = {}, options = {})', () => {
     expect(result.items[0].name).to.eql('Name-2')
   })
 
+  it('supports :not_contains filter', async () => {
+    const result = await table.listItems({ partition, 'pets.cats:not_contains': 'Zoe-0' })
+
+    for (const item of result.items) {
+      expect(item.pets.cats).not.include('Zoe-0')
+
+    }
+  })
+
   it('supports :in filter', async () => {
     const result = await table.listItems({ partition, 'name': [ 'Name-1', 'Name-2' ] })
     expect(result.count).to.eql(2)
