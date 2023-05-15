@@ -3,13 +3,13 @@
 const { expect }  = require('./helpers')
 const { Adapter } = require('src')
 
-const LIMIT = 1000
+const LIMIT = 20
 
 describe('Adapter = (Document, config, tableId)', () => {
   let Klass
+  class Profile {}
 
   before(async () => {
-    class Profile {}
     Klass = Adapter(Profile, {
       tables: {
         default: {
@@ -89,11 +89,26 @@ describe('Adapter = (Document, config, tableId)', () => {
     it('returns all items', async () => {
       const partition = 'Index All'
 
-      for (const index of [ ...Array(LIMIT).keys() ]) {
-        await Klass._create({ id: `TEST_${index}`, partition, name: `Count ${index}` })
+      class ExtendedKlass extends Klass {
+        static get INDEX_LIMIT_MAX() {
+          return 5
+        }
+
+        static async index(context, query = {}, options = {}) {
+          let { items, ...rest } = await this._index(query, options)
+
+          const objects = items.map(item => new this(context, item))
+
+          return { objects, ...rest }
+        }
       }
 
-      const {objects} = await Klass._indexAll({ partition })
+      for (const index of [ ...Array(LIMIT).keys() ]) {
+        await ExtendedKlass._create({ id: `TEST_${index}`, partition, name: `Count ${index}` })
+      }
+
+
+      const {objects} = await ExtendedKlass.indexAll({}, { partition })
       const countItems = objects.length
 
       expect(countItems).to.eql(LIMIT)

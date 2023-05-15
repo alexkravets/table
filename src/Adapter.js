@@ -4,7 +4,6 @@ const Table = require('./Table')
 const getTableOptions = require('./helpers/getTableOptions')
 
 const UNDEFINED_PARTITION = 'UNDEFINED'
-const MAX_LIMIT = 999
 
 const Adapter = (Document, config, tableId) => {
   const options = getTableOptions(config, tableId)
@@ -48,29 +47,29 @@ const Adapter = (Document, config, tableId) => {
       return table.listItems(query, options)
     }
 
-    static async _indexAll(query = {}, options = {}) {
+    static async indexAll(context, query = {}, options = {}) {
       let resultObjects = []
       let lastEvaluatedKey
       let sort
 
       do {
-        const operationOptions = { limit: MAX_LIMIT, ...options}
+        const operationOptions = {limit: this.INDEX_LIMIT_MAX, ...options}
 
         if (lastEvaluatedKey) {
           operationOptions.exclusiveStartKey = lastEvaluatedKey
         }
 
-        const { items, lastEvaluatedKey: responseLastEvaluatedKey } = await this._index(query, operationOptions)
-        resultObjects = [...resultObjects, ...items]
-        lastEvaluatedKey = responseLastEvaluatedKey
+        const {objects, lastEvaluatedKey: nextLastEvaluatedKey} = await this.index(context, query, operationOptions)
+        resultObjects = [...resultObjects, ...objects]
+        lastEvaluatedKey = nextLastEvaluatedKey
 
-        const { sort: requestSort } = query
+        const {sort: requestSort} = query
         sort = requestSort
       } while (lastEvaluatedKey)
 
       const count = resultObjects.length
 
-      return { objects: resultObjects, count, sort }
+      return {objects: resultObjects, count, sort}
     }
 
     static async _read(query, options = {}) {
