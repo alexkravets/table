@@ -4,6 +4,7 @@ const Table = require('./Table')
 const getTableOptions = require('./helpers/getTableOptions')
 
 const UNDEFINED_PARTITION = 'UNDEFINED'
+const MAX_LIMIT = 999
 
 const Adapter = (Document, config, tableId) => {
   const options = getTableOptions(config, tableId)
@@ -45,6 +46,31 @@ const Adapter = (Document, config, tableId) => {
       query = this._getPartitionQuery(query, options.index)
 
       return table.listItems(query, options)
+    }
+
+    static async _indexAll(query = {}, options = {}) {
+      let resultObjects = []
+      let lastEvaluatedKey
+      let sort
+
+      do {
+        const operationOptions = { limit: MAX_LIMIT, ...options}
+
+        if (lastEvaluatedKey) {
+          operationOptions.exclusiveStartKey = lastEvaluatedKey
+        }
+
+        const { items, lastEvaluatedKey: responseLastEvaluatedKey } = await this._index(query, operationOptions)
+        resultObjects = [...resultObjects, ...items]
+        lastEvaluatedKey = responseLastEvaluatedKey
+
+        const { sort: requestSort } = query
+        sort = requestSort
+      } while (lastEvaluatedKey)
+
+      const count = resultObjects.length
+
+      return { objects: resultObjects, count, sort }
     }
 
     static async _read(query, options = {}) {
