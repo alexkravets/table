@@ -11,7 +11,7 @@
     "src": "src"
   },
   "scripts": {
-    "test": "eslint bin/ src/ test/ && NODE_APP_INSTANCE=test NODE_PATH=./ nyc mocha --timeout 10000"
+    "test": "eslint bin/ src/ test/ && NODE_APP_INSTANCE=test NODE_PATH=./ nyc mocha"
   },
   "bin": {
     "table": "bin/table.js"
