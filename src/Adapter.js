@@ -47,6 +47,31 @@ const Adapter = (Document, config, tableId) => {
       return table.listItems(query, options)
     }
 
+    static async indexAll(context, query = {}, options = {}) {
+      let resultObjects = []
+      let lastEvaluatedKey
+      let sort
+
+      do {
+        const operationOptions = {limit: this.INDEX_LIMIT_MAX, ...options}
+
+        if (lastEvaluatedKey) {
+          operationOptions.exclusiveStartKey = lastEvaluatedKey
+        }
+
+        const {objects, lastEvaluatedKey: nextLastEvaluatedKey} = await this.index(context, query, operationOptions)
+        resultObjects = [...resultObjects, ...objects]
+        lastEvaluatedKey = nextLastEvaluatedKey
+
+        const {sort: requestSort} = query
+        sort = requestSort
+      } while (lastEvaluatedKey)
+
+      const count = resultObjects.length
+
+      return {objects: resultObjects, count, sort}
+    }
+
     static async _read(query, options = {}) {
       const { [this.idKey]: idValue, ...other } = query
 
