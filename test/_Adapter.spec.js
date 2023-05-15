@@ -3,8 +3,6 @@
 const { expect }  = require('./helpers')
 const { Adapter } = require('src')
 
-const LIMIT = 20
-
 describe('Adapter = (Document, config, tableId)', () => {
   let Klass
   class Profile {}
@@ -85,9 +83,10 @@ describe('Adapter = (Document, config, tableId)', () => {
     })
   })
 
-  describe('._indexAll(query = {}, options = {})', () => {
+  describe('.indexAll(context, query = {}, options = {})', () => {
     it('returns all items', async () => {
-      const partition = 'Index All'
+      const partition = 'ExtendedKlass'
+      const itemsCount = 21
 
       class ExtendedKlass extends Klass {
         static get INDEX_LIMIT_MAX() {
@@ -103,15 +102,29 @@ describe('Adapter = (Document, config, tableId)', () => {
         }
       }
 
-      for (const index of [ ...Array(LIMIT).keys() ]) {
-        await ExtendedKlass._create({ id: `TEST_${index}`, partition, name: `Count ${index}` })
+      const range = [...Array(itemsCount).keys()]
+
+      for (const index of range) {
+        await ExtendedKlass._create({
+          id: `TEST_${index}`,
+          name: `Count ${index}`,
+          partition,
+        })
       }
 
+      const { objects } =
+        await ExtendedKlass.indexAll({})
 
-      const {objects} = await ExtendedKlass.indexAll({}, { partition })
       const countItems = objects.length
 
-      expect(countItems).to.eql(LIMIT)
+      expect(countItems).to.eql(itemsCount)
+
+      const { objects: objects2 } =
+        await ExtendedKlass.indexAll({}, { partition }, { sort: 'asc'})
+
+      const countItems2 = objects2.length
+
+      expect(countItems2).to.eql(itemsCount)
     })
   })
 })

@@ -52,24 +52,28 @@ const Adapter = (Document, config, tableId) => {
       let lastEvaluatedKey
       let sort
 
+      const limit = this.INDEX_LIMIT_MAX
+
       do {
-        const operationOptions = {limit: this.INDEX_LIMIT_MAX, ...options}
+        const operationOptions = { limit, ...options }
 
         if (lastEvaluatedKey) {
           operationOptions.exclusiveStartKey = lastEvaluatedKey
         }
 
-        const {objects, lastEvaluatedKey: nextLastEvaluatedKey} = await this.index(context, query, operationOptions)
+        const { objects, lastEvaluatedKey: nextLastEvaluatedKey } =
+          await this.index(context, query, operationOptions)
+
         resultObjects = [...resultObjects, ...objects]
         lastEvaluatedKey = nextLastEvaluatedKey
 
-        const {sort: requestSort} = query
+        const { sort: requestSort } = query
         sort = requestSort
       } while (lastEvaluatedKey)
 
       const count = resultObjects.length
 
-      return {objects: resultObjects, count, sort}
+      return { objects: resultObjects, count, sort }
     }
 
     static async _read(query, options = {}) {
