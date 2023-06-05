@@ -18,6 +18,14 @@ module.exports = (Document, path = 'identity.organizationId') =>
       }
     }
 
+    static get documentName() {
+      if (!this.name) {
+        throw new Error('Document class name is undefined, define with "static get documentName()" method')
+      }
+
+      return this.name
+    }
+
     static _getPartition(context, parameters) {
       const { partition } = parameters
 
@@ -36,10 +44,10 @@ module.exports = (Document, path = 'identity.organizationId') =>
 
     static _extendIndexQueryWithIdPrefix(context, query, options) {
       const hasIndex = !!options.index
-      const hasDefaultPrefix = this.idKeyPrefix === this.name
+      const hasDefaultPrefix = this.idKeyPrefix === this.documentName
       const hasIdQueryDefined = !!query[INDEX_QUERY_ID_PREFIX_KEY]
 
-      query.document = this.name
+      query.document = this.documentName
 
       if (!hasIndex) {
         query.partition = this._getPartition(context, query)
@@ -68,14 +76,14 @@ module.exports = (Document, path = 'identity.organizationId') =>
     static async create(context, query, mutation) {
       const parameters = mutation || query
 
-      mutation.document = this.name
-      mutation.partition = this._getPartition(context, parameters)
+      parameters.document = this.documentName
+      parameters.partition = this._getPartition(context, parameters)
 
-      return super.create(context, query, mutation)
+      return super.create(context, parameters)
     }
 
     static async read(context, query, options = {}) {
-      query.document = this.name
+      query.document = this.documentName
 
       if (!options.index) {
         query.partition = this._getPartition(context, query)
@@ -85,14 +93,14 @@ module.exports = (Document, path = 'identity.organizationId') =>
     }
 
     static async update(context, query, mutation) {
-      query.document = this.name
+      query.document = this.documentName
       query.partition = this._getPartition(context, query)
 
       return super.update(context, query, mutation)
     }
 
     static async delete(context, query) {
-      query.document = this.name
+      query.document = this.documentName
       query.partition = this._getPartition(context, query)
 
       return super.delete(context, query)
