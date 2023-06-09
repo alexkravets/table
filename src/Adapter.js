@@ -3,8 +3,6 @@
 const Table = require('./Table')
 const getTableOptions = require('./helpers/getTableOptions')
 
-const UNDEFINED_PARTITION = 'UNDEFINED'
-
 const Adapter = (Document, config, tableId) => {
   const options = getTableOptions(config, tableId)
   const table = new Table(options)
@@ -27,8 +25,16 @@ const Adapter = (Document, config, tableId) => {
       return ID_KEY
     }
 
+    static get documentName() {
+      if (!this.name) {
+        throw new Error('Document class name is undefined')
+      }
+
+      return this.name
+    }
+
     static get partition() {
-      return this.name || UNDEFINED_PARTITION
+      return this.documentName
     }
 
     static _create(attributes) {

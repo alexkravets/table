@@ -4,22 +4,20 @@ const { expect }  = require('./helpers')
 const { Adapter } = require('src')
 
 describe('Adapter = (Document, config, tableId)', () => {
-  let Klass
   class Profile {}
-
-  before(async () => {
-    Klass = Adapter(Profile, {
-      tables: {
-        default: {
-          indexes: {
-            nameIndex: {
-              sortKey: 'name'
-            }
+  class Klass extends Adapter(Profile, {
+    tables: {
+      default: {
+        indexes: {
+          nameIndex: {
+            sortKey: 'name'
           }
         }
       }
-    }, 'default')
+    }
+  }, 'default') {}
 
+  before(async () => {
     await Klass.table.reset()
   })
 
@@ -28,6 +26,28 @@ describe('Adapter = (Document, config, tableId)', () => {
   describe('.idKey', async () => {
     it('returns default sortKey', () => {
       expect(Klass.idKey).to.eql('id')
+    })
+  })
+
+  describe('.documentName', async () => {
+    it('returns document class name', () => {
+      expect(Klass.documentName).to.eql('Klass')
+    })
+
+    it('throws error if document class name is undefined', () => {
+      let UndefinedName = Adapter(Profile, {
+        tables: {
+          default: {
+            indexes: {
+              nameIndex: {
+                sortKey: 'name'
+              }
+            }
+          }
+        }
+      }, 'default')
+
+      expect(() => UndefinedName.documentName).to.throw('Document class name is undefined')
     })
   })
 

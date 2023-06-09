@@ -18,14 +18,6 @@ module.exports = (Document, path = 'identity.organizationId') =>
       }
     }
 
-    static get documentName() {
-      if (!this.name) {
-        throw new Error('Document class name is undefined, define with "static get documentName()" method')
-      }
-
-      return this.name
-    }
-
     static _getPartition(context, parameters) {
       const { partition } = parameters
 

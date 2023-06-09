@@ -36,8 +36,7 @@ module.exports = (Document, idKeyPrefix = '') =>
       const [lastItem] = items
 
       if (lastItem) {
-        const { secondaryKey } = lastItem
-        const number = Number(secondaryKey)
+        const { number } = lastItem
         return number + 1
       }
 
@@ -45,12 +44,23 @@ module.exports = (Document, idKeyPrefix = '') =>
     }
 
     static async _create(attributes) {
-      const { partition, document } = attributes
+      let { partition, document } = attributes
+
+      if (!partition) {
+        partition = this.partition
+        attributes.partition = this.partition
+      }
+
+      if (!document) {
+        document = this.name
+        attributes.document = this.documentName
+      }
 
       const number = await this._getNextNumber(partition, document)
 
-      attributes.secondaryKey = `${number}`
+      attributes.number = number
       attributes[this.idKey] = this._createHashId(number)
+      attributes.secondaryKey = attributes.createdAt
 
       try {
         const result = await super._create(attributes)
