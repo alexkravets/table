@@ -6,6 +6,7 @@ const Hashids = require('hashids')
 const wait = util.promisify(setTimeout)
 
 const CHARACTER_SET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+const SECONDARY_KEY_INDEX = 'secondaryKeyIndex'
 
 module.exports = (Document, idKeyPrefix = '') =>
   class extends Document {
@@ -29,12 +30,14 @@ module.exports = (Document, idKeyPrefix = '') =>
 
     static async _getNextNumber(partition, document) {
       const query = { partition, document }
+      const options = { index: SECONDARY_KEY_INDEX, limit: 1, sort: 'desc' }
 
-      const { items } = await this._index(query, { limit: 1, sort: 'desc' })
+      const { items } = await this._index(query, options)
       const [lastItem] = items
 
       if (lastItem) {
-        const { number } = lastItem
+        const { secondaryKey } = lastItem
+        const number = Number(secondaryKey)
         return number + 1
       }
 
@@ -46,7 +49,7 @@ module.exports = (Document, idKeyPrefix = '') =>
 
       const number = await this._getNextNumber(partition, document)
 
-      attributes.number = number
+      attributes.secondaryKey = `${number}`
       attributes[this.idKey] = this._createHashId(number)
 
       try {
