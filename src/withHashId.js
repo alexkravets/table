@@ -36,7 +36,7 @@ module.exports = (Document, idKeyPrefix = '') =>
       const [lastItem] = items
 
       if (lastItem) {
-        const { number } = lastItem
+        const { number = 0 } = lastItem
         return number + 1
       }
 

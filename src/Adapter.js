@@ -56,7 +56,6 @@ const Adapter = (Document, config, tableId) => {
     static async indexAll(context, query = {}, options = {}) {
       let resultObjects = []
       let lastEvaluatedKey
-      let sort
 
       const limit = this.INDEX_LIMIT_MAX
 
@@ -73,13 +72,11 @@ const Adapter = (Document, config, tableId) => {
         resultObjects = [...resultObjects, ...objects]
         lastEvaluatedKey = nextLastEvaluatedKey
 
-        const { sort: requestSort } = query
-        sort = requestSort
       } while (lastEvaluatedKey)
 
       const count = resultObjects.length
 
-      return { objects: resultObjects, count, sort }
+      return { objects: resultObjects, count }
     }
 
     static async _read(query, options = {}) {
