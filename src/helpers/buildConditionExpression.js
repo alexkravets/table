@@ -17,7 +17,7 @@ const buildConditionExpression = query => {
     const isGreaterThan = key.endsWith(':gt')
     const isNotContains = key.endsWith(':not_contains')
 
-    const isNull = filterValue === null
+    const isFilterValueNull = filterValue === null
 
     if (isNot) {
       key = key.replace(/:not/g, '')
@@ -65,7 +65,7 @@ const buildConditionExpression = query => {
         path = path.replace(/:not/, '')
         ConditionExpression.push(`${path} <> :Q_${valueKey}`)
 
-        if (isNull) {
+        if (isFilterValueNull) {
           ConditionExpression.push(`attribute_exists(${path})`)
         }
 
@@ -86,7 +86,7 @@ const buildConditionExpression = query => {
         ConditionExpression.push(`${path} > :Q_${valueKey}`)
 
       } else {
-        if (isNull) {
+        if (isFilterValueNull) {
           ConditionExpression.push(`(${path} = :Q_${valueKey} OR attribute_not_exists(${path}))`)
         } else {
           ConditionExpression.push(`${path} = :Q_${valueKey}`)
