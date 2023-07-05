@@ -36,8 +36,16 @@ describe('table.listItems(query = {}, options = {})', () => {
         }
       }
 
+      if (index === 2) {
+        delete attributes.age
+      }
+      if (index === 3) {
+        attributes.age = null
+      }
+
       await table.createItem(attributes)
     }
+
   })
 
   it('returns items with pagination parameters', async () => {
@@ -118,6 +126,16 @@ describe('table.listItems(query = {}, options = {})', () => {
   it('supports :not filter', async () => {
     const result = await table.listItems({ partition, 'age:not': 0 })
     expect(result.items[0].age).to.eql(1)
+  })
+
+  it('supports :not null filter', async () => {
+    const result = await table.listItems({ partition, 'age:not': null })
+    expect(result.items).to.have.lengthOf(LIMIT - 1)
+  })
+
+  it('supports null filter', async () => {
+    const result = await table.listItems({ partition, 'age': null })
+    expect(result.items).to.have.lengthOf(2)
   })
 
   it('supports :contains filter', async () => {
