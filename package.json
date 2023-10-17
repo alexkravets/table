@@ -1,6 +1,6 @@
 {
   "name": "@kravc/table",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Simple CRUD and query interface for DynamoDB table as a storage for @kravc/dos service.",
   "main": "src/index.js",
   "repository": {
@@ -19,16 +19,16 @@
   "author": "Alexander Kravets <alex@slatestudio.com>",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.284.0",
-    "@aws-sdk/credential-providers": "^3.282.0",
-    "@aws-sdk/lib-dynamodb": "^3.284.0",
+    "@aws-sdk/client-dynamodb": "^3.429.0",
+    "@aws-sdk/credential-providers": "^3.429.0",
+    "@aws-sdk/lib-dynamodb": "^3.429.0",
     "hashids": "^2.3.0",
     "lodash.get": "^4.4.2",
     "lodash.uniq": "^4.5.0"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "eslint": "^7.10.0",
+    "chai": "^4.3.10",
+    "eslint": "^8.51.0",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "ulid": "^2.3.0"
