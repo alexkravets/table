@@ -44,7 +44,7 @@ module.exports = (Document, idKeyPrefix = '') =>
     }
 
     static async _create(attributes) {
-      let { partition, document } = attributes
+      let { partition, document, number } = attributes
 
       if (!partition) {
         partition = this.partition
@@ -56,7 +56,9 @@ module.exports = (Document, idKeyPrefix = '') =>
         attributes.document = this.documentName
       }
 
-      const number = await this._getNextNumber(partition, document)
+      if (!number) {
+        number = await this._getNextNumber(partition, document)
+      }
 
       attributes.number = number
       attributes[this.idKey] = this._createHashId(number)
@@ -67,6 +69,7 @@ module.exports = (Document, idKeyPrefix = '') =>
         return result
       } catch (error) {
         if (error.code === 'DocumentExistsError') {
+          delete attributes.number
           await wait(25)
           await this._create(attributes)
         } else {
