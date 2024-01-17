@@ -64,17 +64,15 @@ module.exports = (Document, idKeyPrefix = '') =>
       attributes[this.idKey] = this._createHashId(number)
       attributes.secondaryKey = attributes.createdAt
 
-      try {
-        const result = await super._create(attributes)
-        return result
-      } catch (error) {
-        if (error.code === 'DocumentExistsError') {
-          delete attributes.number
-          await wait(25)
-          await this._create(attributes)
-        } else {
-          throw error
-        }
+      const isCreated = await super._create(attributes)
+
+      if (isCreated) {
+        return true
       }
+
+      await wait(50)
+
+      attributes.number = null
+      return this._create(attributes)
     }
   }
