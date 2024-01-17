@@ -84,11 +84,11 @@ module.exports = (Document, path = 'identity.organizationId') =>
       return super.read(context, query, options)
     }
 
-    static async update(context, query, mutation) {
+    static async update(context, query, mutation, originalDocument) {
       query.document = this.documentName
       query.partition = this._getPartition(context, query)
 
-      return super.update(context, query, mutation)
+      return super.update(context, query, mutation, originalDocument)
     }
 
     static async delete(context, query) {
