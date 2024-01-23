@@ -32,11 +32,6 @@ const listItems = async (client, tableName, indexKey, query, options) => {
     items = [ ...items, ...chunk ]
     count = items.length
 
-    if (hasLimit && count > limit) {
-      items = items.slice(0, limit)
-      count = limit
-    }
-
     lastEvaluatedKey    = LastEvaluatedKey
     isNextChunkRequired = (hasLimit && count < limit) && !!LastEvaluatedKey
 

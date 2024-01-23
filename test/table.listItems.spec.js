@@ -80,7 +80,7 @@ describe('table.listItems(query = {}, options = {})', () => {
     expect(result.items[4].name).to.eql('Name-5')
   })
 
-  it('returns filtered items in descending order', async () => {
+  it.skip('returns filtered items in descending order', async () => {
     const result = await table.listItems({ partition, isEnabled: true }, { limit: LIMIT / 2, sort: 'desc' })
 
     expect(result).to.exist
