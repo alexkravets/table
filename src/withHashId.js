@@ -5,13 +5,35 @@ const Hashids = require('hashids')
 
 const wait = util.promisify(setTimeout)
 
+const SORT_DESC = 'desc'
 const CHARACTER_SET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
-const SECONDARY_KEY_INDEX = 'secondaryKeyIndex'
+const SECONDARY_KEY = 'secondaryKey'
 
 module.exports = (Document, idKeyPrefix = '') =>
   class extends Document {
-    static _createHashId(number) {
-      const hashids = new Hashids(this.name, 0, CHARACTER_SET)
+    static get secondaryKeyIndex() {
+      return `${SECONDARY_KEY}Index`
+    }
+
+    /* NOTE: For default index operation use secondary index to query items
+             using secondary key. */
+    static _index(query, options) {
+      const extendedQuery = {
+        [`${SECONDARY_KEY}:bw`]: this.documentName,
+        ...query
+      }
+
+      const extendedOptions = { ...options }
+
+      if (!options.index) {
+        extendedOptions.index = this.secondaryKeyIndex
+      }
+
+      return super._index(extendedQuery, extendedOptions)
+    }
+
+    static _createHashId(document, number) {
+      const hashids = new Hashids(document, 0, CHARACTER_SET)
       const hashId = hashids.encode(number)
 
       if (idKeyPrefix) {
@@ -28,9 +50,9 @@ module.exports = (Document, idKeyPrefix = '') =>
       return hashId
     }
 
-    static async _getNextNumber(partition, document) {
-      const query = { partition, document }
-      const options = { index: SECONDARY_KEY_INDEX, limit: 1, sort: 'desc' }
+    static async _getNextNumber(partition) {
+      const query = { partition }
+      const options = { limit: 1, sort: SORT_DESC }
 
       const { items } = await this._index(query, options)
       const [lastItem] = items
@@ -44,7 +66,7 @@ module.exports = (Document, idKeyPrefix = '') =>
     }
 
     static async _create(attributes) {
-      let { partition, document, number } = attributes
+      let { partition, document, number, createdAt } = attributes
 
       if (!partition) {
         partition = this.partition
@@ -52,17 +74,17 @@ module.exports = (Document, idKeyPrefix = '') =>
       }
 
       if (!document) {
-        document = this.name
+        document = this.documentName
         attributes.document = this.documentName
       }
 
       if (!number) {
-        number = await this._getNextNumber(partition, document)
+        number = await this._getNextNumber(partition)
       }
 
       attributes.number = number
-      attributes[this.idKey] = this._createHashId(number)
-      attributes.secondaryKey = attributes.createdAt
+      attributes[this.idKey] = this._createHashId(document, number)
+      attributes.secondaryKey = `${document}_${createdAt}`
 
       const isCreated = await super._create(attributes)
 
