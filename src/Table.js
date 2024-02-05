@@ -122,16 +122,16 @@ class Table {
     await this.create()
   }
 
-  createItem(attributes) {
-    this._getKey('Create', attributes)
-
-    return createItem(this._client, this._tableName, this._primaryKey, attributes)
-  }
-
   getItem(query, options = {}) {
     const { key } = this._getKey('Get', query)
 
     return getItem(this._client, this._tableName, key, options)
+  }
+
+  createItem(attributes) {
+    this._getKey('Create', attributes)
+
+    return createItem(this._client, this._tableName, this._primaryKey, attributes)
   }
 
   deleteItem(query) {
@@ -188,9 +188,9 @@ class Table {
       ...conditionQuery
     } = query
 
-    const isMissingKey = !!partitionKeyValue && !!sortKeyValue
+    const hasKey = !!partitionKeyValue && !!sortKeyValue
 
-    if (!isMissingKey) {
+    if (!hasKey) {
       const message = `Item method "${methodName}" requires "${partitionKey}"` +
         ` and "${sortKey}" to be defined in query`
 

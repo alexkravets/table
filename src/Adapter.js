@@ -1,6 +1,7 @@
 'use strict'
 
 const Table = require('./Table')
+const filterItem = require('./helpers/filterItem')
 const getTableOptions = require('./helpers/getTableOptions')
 
 const Adapter = (Document, config, tableId) => {
@@ -80,20 +81,16 @@ const Adapter = (Document, config, tableId) => {
     }
 
     static async _read(query, options = {}) {
-      const { [this.idKey]: idValue, ...other } = query
+      const { [this.idKey]: idValue, ...queryConditions } = query
 
-      const hasIndex = !!options.index
-      const hasOther = Object.keys(other).length > 0
-      const isQuery  = hasIndex || hasOther
-
-      if (isQuery) {
-        const { items } = await this._index(query, { ...options, limit: 1 })
-        return items[0]
+      if (!idValue) {
+        throw new Error(`Query missing ${this.idKey} parameter`)
       }
 
-      query = this._getPartitionQuery({ [this.idKey]: idValue }, options.index)
+      const getItemQuery = this._getPartitionQuery(query)
+      const item = await table.getItem(getItemQuery, options)
 
-      return table.getItem(query, options)
+      return filterItem(item, queryConditions)
     }
 
     static _update(query, attributes) {
@@ -121,8 +118,8 @@ const Adapter = (Document, config, tableId) => {
       }
 
       return {
+        ...query,
         [PARTITION_KEY]: this.partition,
-        ...query
       }
     }
   }
