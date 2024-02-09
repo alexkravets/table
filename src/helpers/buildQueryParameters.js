@@ -3,6 +3,7 @@
 const querystring               = require('querystring')
 const buildConditionExpression  = require('./buildConditionExpression')
 const buildProjectionExpression = require('./buildProjectionExpression')
+const _extendKeyConditionExpressionParameters = require('./_extendKeyConditionExpressionParameters')
 
 const buildQueryParameters = (TableName, indexKey, query, options) => {
   const { sortKey, partitionKey } = indexKey
@@ -10,6 +11,8 @@ const buildQueryParameters = (TableName, indexKey, query, options) => {
   const {
     [sortKey]:         sortKeyValue,
     [`${sortKey}:bw`]: sortKeyBeginsWithValue,
+    [`${sortKey}:lt`]: sortKeyLowerThanValue,
+    [`${sortKey}:gt`]: sortKeyGreaterThanValue,
     [partitionKey]:    partitionKeyValue,
     ...conditionQuery
   } = query
@@ -58,48 +61,12 @@ const buildQueryParameters = (TableName, indexKey, query, options) => {
   parameters.ExpressionAttributeNames[`#${partitionKey}`]  = partitionKey
   parameters.ExpressionAttributeValues[`:${partitionKey}`] = partitionKeyValue
 
-  // NOTE: Sort key may support other comparison options:
-  //       https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
-
-  // Valid comparisons for the sort key condition are as follows:
-
-  // sortKeyName < :sortkeyval - true if the sort key value is less than
-  //   :sortkeyval.
-
-  // sortKeyName <= :sortkeyval - true if the sort key value is less than or
-  //   equal to :sortkeyval.
-
-  // sortKeyName > :sortkeyval - true if the sort key value is greater than
-  //   :sortkeyval.
-
-  // sortKeyName >= :sortkeyval - true if the sort key value is greater than
-  //   or equal to :sortkeyval.
-
-  // sortKeyName BETWEEN :sortkeyval1 AND :sortkeyval2 - true if the sort key
-  //   value is greater than or equal to :sortkeyval1, and less than or equal
-  //   to :sortkeyval2.
-
-  if (sortKeyValue) {
-    // sortKeyName = :sortkeyval - true if the sort key value is equal to
-    //   :sortkeyval.
-    parameters.KeyConditionExpression += ` AND #${sortKey} = :${sortKey}`
-
-    parameters.ExpressionAttributeNames[`#${sortKey}`]  = sortKey
-    parameters.ExpressionAttributeValues[`:${sortKey}`] = sortKeyValue
-  }
-
-  if (sortKeyBeginsWithValue) {
-    // begins_with ( sortKeyName, :sortkeyval ) - true if the sort key value/
-    //   begins with a particular operand. (You cannot use this function with a
-    //   sort key that is of type Number.) Note that the function name
-    //   begins_with is case-sensitive.
-    // Use the ExpressionAttributeValues parameter to replace tokens such as
-    // :partitionval and :sortval with actual values at runtime.
-    parameters.KeyConditionExpression += ` AND begins_with(#${sortKey}, :${sortKey})`
-
-    parameters.ExpressionAttributeNames[`#${sortKey}`]  = sortKey
-    parameters.ExpressionAttributeValues[`:${sortKey}`] = sortKeyBeginsWithValue
-  }
+  _extendKeyConditionExpressionParameters(parameters, sortKey, {
+    sortKeyValue,
+    sortKeyBeginsWithValue,
+    sortKeyLowerThanValue,
+    sortKeyGreaterThanValue,
+  })
 
   if (projection) {
     const {
