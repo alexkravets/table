@@ -1,6 +1,6 @@
 'use strict'
 
-const _extendKeyConditionExpressionParameters = (parameters, sortKey, {
+const extendKeyConditionExpressionParameters = (parameters, sortKey, {
   sortKeyValue,
   sortKeyBeginsWithValue,
   sortKeyLowerThanValue,
@@ -80,4 +80,4 @@ const _extendKeyConditionExpressionParameters = (parameters, sortKey, {
   }
 }
 
-module.exports = _extendKeyConditionExpressionParameters
+module.exports = extendKeyConditionExpressionParameters
