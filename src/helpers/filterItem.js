@@ -16,7 +16,7 @@ const filterItem = (item, conditionsMap) => {
     // const isGreaterThan = key.endsWith(':gt')
     const isNotContains = key.endsWith(':not_contains')
 
-    // const isFilterValueNull = filterValue === null
+    const isFilterValueNull = value === null
 
     let path = key
     let match = (a, b) => a === b
@@ -24,6 +24,14 @@ const filterItem = (item, conditionsMap) => {
     if (isNot) {
       path = key.replace(/:not/g, '')
       match = (a, b) => a !== b
+    }
+
+    if (isFilterValueNull) {
+      if (isNot) {
+        match = (a) => a !== undefined
+      } else {
+        match = (a) => a === undefined
+      }
     }
 
     if (isContains) {
