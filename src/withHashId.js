@@ -18,15 +18,12 @@ module.exports = (Document, idKeyPrefix = '') =>
     /* NOTE: For default index operation use secondary index to query items
              using secondary key. */
     static _index(query, options) {
-      const extendedQuery = {
-        [`${SECONDARY_KEY}:bw`]: this.documentName,
-        ...query
-      }
-
+      const extendedQuery = { ...query }
       const extendedOptions = { ...options }
 
       if (!options.index) {
         extendedOptions.index = this.secondaryKeyIndex
+        extendedQuery[`${SECONDARY_KEY}:bw`] = this.documentName
       }
 
       return super._index(extendedQuery, extendedOptions)
