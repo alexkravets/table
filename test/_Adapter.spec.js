@@ -1,7 +1,7 @@
 'use strict'
 
-const { expect }  = require('./helpers')
 const { Adapter } = require('src')
+const { expect, expectError } = require('./helpers')
 
 describe('Adapter = (Document, config, tableId)', () => {
   class Profile {}
@@ -87,6 +87,11 @@ describe('Adapter = (Document, config, tableId)', () => {
     it('returns item for query request', async () => {
       const item = await Klass._read({ id, name: 'Hello, world!' })
       expect(item).to.exist
+    })
+
+    it('throws an error if id is not provided', async () => {
+      const error = await expectError(() => Klass._read({ id: undefined }))
+      expect(error.message).to.include('Query missing id parameter')
     })
   })
 

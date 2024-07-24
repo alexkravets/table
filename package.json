@@ -11,7 +11,7 @@
     "src": "src"
   },
   "scripts": {
-    "test": "eslint bin/ src/ test/ && NODE_APP_INSTANCE=test NODE_PATH=./ nyc mocha"
+    "test": "eslint bin/ src/ test/ && NODE_APP_INSTANCE=test NODE_PATH=./ nyc --skip-full mocha"
   },
   "bin": {
     "table": "bin/table.js"

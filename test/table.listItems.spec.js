@@ -159,6 +159,22 @@ describe('table.listItems(query = {}, options = {})', () => {
     expect(result.items[1].name).to.eql('Name-2')
   })
 
+  it('supports :gt filter for sortKey', async () => {
+    const result = await table.listItems({ partition, 'name:gt': 'Name-9' }, { index: 'nameIndex' })
+    expect(result.count).to.eql(1)
+    expect(result.items[0].name).to.eql('Name-9')
+  })
+
+  it('supports :lt filter for sortKey', async () => {
+    const result = await table.listItems({ partition, 'name:lt': 'Name-2' }, { index: 'nameIndex' })
+    expect(result.items[0].name).to.eql('Name-0')
+  })
+
+  it('supports :lt and :gt filters for sortKey', async () => {
+    const result = await table.listItems({ partition, 'name:gt': 'Name-2', 'name:lt': 'Name-4' }, { index: 'nameIndex' })
+    expect(result.items[0].name).to.eql('Name-2')
+  })
+
   it('throws error if index not found', async () => {
     const error = await expectError(() => table.listItems({ partition }, { index: 'BAD_INDEX' }))
     expect(error.message).to.include('Index "kravc-table-test.BAD_INDEX" is not defined')
