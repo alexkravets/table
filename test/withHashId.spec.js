@@ -13,7 +13,7 @@ const Document = class {
 
 const CustomDocument = require('src/withHashId')(Document)
 
-describe('Custom Document Class', () => {
+describe('withPartition = (Document, idKeyPrefix)', () => {
   describe('secondaryKeyIndex', () => {
     it('should return the correct secondary key index', () => {
       expect(CustomDocument.secondaryKeyIndex).to.equal(`${SECONDARY_KEY}Index`)
