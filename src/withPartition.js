@@ -1,6 +1,6 @@
 'use strict'
 
-const get = require('lodash.get')
+const { get } = require('lodash')
 
 const INDEX_QUERY_ID_PREFIX_KEY = 'id:bw'
 

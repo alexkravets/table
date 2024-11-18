@@ -1,6 +1,6 @@
 'use strict'
 
-const get                    = require('lodash.get')
+const { get }                = require('lodash')
 const { homedir }            = require('os')
 const { fromIni }            = require('@aws-sdk/credential-providers')
 const { existsSync }         = require('fs')

@@ -23,7 +23,7 @@ if (env) {
   process.env.NODE_APP_INSTANCE = env
 }
 
-const get      = require('lodash.get')
+const { get }  = require('lodash')
 const Table    = require('../src/Table')
 const config   = require('config')
 const { exec } = require('child_process')
@@ -71,7 +71,7 @@ const run = async callback => {
     return callback()
   }
 
-  const command = exec('docker-compose -f node_modules/@kravc/table/docker-compose.yaml up -d', callback)
+  const command = exec('docker compose -f node_modules/@kravc/table/docker-compose.yaml up -d', callback)
   command.stdout.on('data', data => console.log(data))
   command.stderr.on('data', data => console.error(data))
 }

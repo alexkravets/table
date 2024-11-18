@@ -1,6 +1,6 @@
 'use strict'
 
-const uniq = require('lodash.uniq')
+const { uniq } = require('lodash')
 
 const getAttributeDefinitions = (partitionKey, sortKey, indexes) => {
   const AttributeDefinitions = []
