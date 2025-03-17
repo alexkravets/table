@@ -28,7 +28,7 @@ const buildUpdateExpression = (parameters, attributes) => {
     const shouldRemoveAttribute = expressionValue === null
 
     if (shouldRemoveAttribute) {
-      RemoveExpressions.push(`#${name}`)
+      RemoveExpressions.push(`${path}`)
       continue
     }
 

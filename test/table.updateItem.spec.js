@@ -52,6 +52,15 @@ describe('table.updateItem(query, attributes)', () => {
     expect(item.size).to.not.exist
   })
 
+  it('removes items nested attribute', async () => {
+    const item = await table.updateItem({ id, partition }, {
+      'pets.status': null
+    })
+
+    expect(item).to.be.exist
+    expect(item.pets.status).to.not.exist
+  })
+
   it('updates item list element by index', async () => {
     const item = await table.updateItem({ id, partition }, {
       'pets.dogs[0]': 'Bob'
