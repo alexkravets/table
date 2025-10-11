@@ -102,9 +102,9 @@ describe('Adapter = (Document, config, tableId)', () => {
     })
   })
 
-  describe('._delete(query)', () => {
+  describe('._delete(context, query)', () => {
     it('deletes item', async () => {
-      await Klass._delete({ id })
+      await Klass._delete({}, { id })
     })
   })
 

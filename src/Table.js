@@ -60,8 +60,11 @@ class Table {
 
     }
 
-    /* istanbul ignore else */
-    if (hasAwsCredentials) {
+    /* istanbul ignore next */
+    const shouldSetCredentials = !isLocal && hasAwsCredentials
+
+    /* istanbul ignore next */
+    if (shouldSetCredentials) {
       const profile = get(options, 'profile', DEFAULT_PROFILE)
       config.credentials = fromIni({ profile })
     }

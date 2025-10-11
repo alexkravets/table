@@ -99,7 +99,7 @@ const Adapter = (Document, config, tableId) => {
       return table.updateItem(query, attributes)
     }
 
-    static _delete(query) {
+    static _delete(context, query) {
       query = this._getPartitionQuery(query)
 
       return table.deleteItem(query)
