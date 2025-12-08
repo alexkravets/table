@@ -25,6 +25,7 @@ const INSTANCE        = process.env.NODE_APP_INSTANCE
 const LOCAL_REGION    = 'local'
 const LOCAL_ENDPOINT  = 'http://0.0.0.0:8000'
 const DEFAULT_PROFILE = 'private'
+const DEFAULT_MAX_ATTEMPTS = 10
 
 const DEFAULT_INDEXES     = {}
 /* istanbul ignore next */
@@ -41,7 +42,8 @@ class Table {
     const tableOptions = {}
 
     const config = {
-      region: get(options, 'region', LOCAL_REGION)
+      region: get(options, 'region', LOCAL_REGION),
+      maxAttempts: DEFAULT_MAX_ATTEMPTS,
     }
 
     const isLocal = config.region === LOCAL_REGION
