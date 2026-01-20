@@ -1,6 +1,5 @@
 'use strict'
 
-const querystring               = require('querystring')
 const buildConditionExpression  = require('./buildConditionExpression')
 const buildProjectionExpression = require('./buildProjectionExpression')
 const extendKeyConditionExpressionParameters = require('./extendKeyConditionExpressionParameters')
@@ -52,7 +51,7 @@ const buildQueryParameters = (TableName, indexKey, query, options) => {
   }
 
   if (exclusiveStartKey) {
-    parameters.ExclusiveStartKey = querystring.parse(exclusiveStartKey)
+    parameters.ExclusiveStartKey = JSON.parse(decodeURIComponent(exclusiveStartKey))
   }
 
   parameters.ConsistentRead = consistentRead

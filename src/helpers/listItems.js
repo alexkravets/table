@@ -1,7 +1,6 @@
 'use strict'
 
 const queryItems  = require('./queryItems')
-const queryString = require('querystring')
 const createError = require('./createError')
 const buildQueryParameters = require('./buildQueryParameters')
 
@@ -40,7 +39,7 @@ const listItems = async (client, tableName, indexKey, query, options) => {
   } while (isNextChunkRequired)
 
   if (lastEvaluatedKey) {
-    lastEvaluatedKey = queryString.stringify(lastEvaluatedKey)
+    lastEvaluatedKey = encodeURIComponent(JSON.stringify(lastEvaluatedKey))
   }
 
   return { items, count, lastEvaluatedKey }
